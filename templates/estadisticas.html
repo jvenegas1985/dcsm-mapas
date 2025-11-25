@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estadísticas - Tiendas Costa Rica</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .card { background: white; padding: 20px; margin: 10px 0; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .btn { display: inline-block; padding: 10px 15px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>📊 Estadísticas de Tiendas</h1>
+            <a href="/" class="btn"><i class="fas fa-home"></i> Inicio</a>
+            <a href="/mapa" class="btn"><i class="fas fa-map"></i> Ver Mapa</a>
+        </div>
+
+        <div class="card">
+            <h2>Resumen General</h2>
+            <p><strong>Total de ubicaciones:</strong> {{ stats.total_sucursales + stats.total_tiendas_proyecto + stats.total_tiendas_oro + stats.total_clientes_premium }}</p>
+        </div>
+
+        <div class="card">
+            <h3>🏪 Sucursales Activas</h3>
+            <p><strong>Total:</strong> {{ stats.total_sucursales }}</p>
+        </div>
+
+        <div class="card">
+            <h3>🚧 Tiendas de Otro Proyecto</h3>
+            <p><strong>Total:</strong> {{ stats.total_tiendas_proyecto }}</p>
+        </div>
+
+        <div class="card">
+            <h3>❄️ Tiendas Oro (Congeladores)</h3>
+            <p><strong>Total:</strong> {{ stats.total_tiendas_oro }}</p>
+            <p><strong>Activas:</strong> {{ stats.tiendas_oro_activas }}</p>
+            <p><strong>En mantenimiento:</strong> {{ stats.total_tiendas_oro - stats.tiendas_oro_activas }}</p>
+        </div>
+
+        <div class="card">
+            <h3>⭐ Clientes Premium</h3>
+            <p><strong>Total:</strong> {{ stats.total_clientes_premium }}</p>
+        </div>
+    </div>
+</body>
+</html>

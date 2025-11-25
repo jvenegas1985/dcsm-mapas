@@ -1,0 +1,30 @@
+[
+  {
+    "id": "SAT-001",
+    "nombre": "TIENDA SATÉLITE DESAMPARADOS",
+    "ciudad": "DESAMPARADOS",
+    "lat": 9.89992377,
+    "lon": -84.06821737,
+    "direccion": "CENTRO DESAMPARADOS",
+    "telefono": "2278-9012",
+    "estado": "activo",
+    "fecha_apertura": "2024-01-15",
+    "tipo_satelite": "mini_mercado",
+    "convenio": "activo",
+    "responsable": "Pedro Sánchez"
+  },
+  {
+    "id": "SAT-002",
+    "nombre": "TIENDA SATÉLITE CARTAGO",
+    "ciudad": "CARTAGO", 
+    "lat": 9.86252574,
+    "lon": -83.93305301,
+    "direccion": "TARAS CARTAGO",
+    "telefono": "2551-3456",
+    "estado": "planeado",
+    "fecha_apertura": "2023-11-01",
+    "tipo_satelite": "abarrotes",
+    "convenio": "suspendido",
+    "responsable": "Laura González"
+  }
+]

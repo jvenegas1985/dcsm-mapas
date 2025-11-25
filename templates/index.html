@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="es" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa Comercial - Carnes San Martín</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #7f8c8d;
+            --accent-color: #3498db;
+            --light-gray: #f8f9fa;
+            --medium-gray: #e9ecef;
+            --dark-gray: #6c757d;
+            --text-color: #2c3e50;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--light-gray);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+            border: 1px solid var(--medium-gray);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+            background: white;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border-color: var(--accent-color);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 0;
+            color: var(--primary-color);
+        }
+        
+        .custom-icon {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .custom-icon img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            filter: grayscale(30%);
+        }
+        
+        .card-hover:hover .custom-icon img {
+            transform: scale(1.05);
+            filter: grayscale(0%);
+        }
+        
+        .header-section {
+            background: white;
+            color: var(--text-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid var(--medium-gray);
+        }
+        
+        .btn-modern {
+            background: var(--primary-color);
+            border: none;
+            color: white;
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-modern:hover {
+            background: var(--accent-color);
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.2);
+        }
+        
+        .card-title {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .card-text {
+            color: var(--dark-gray);
+            font-size: 0.9rem;
+        }
+        
+        .badge {
+            font-weight: 500;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+        
+        .border-subtle {
+            border-color: var(--medium-gray) !important;
+        }
+        
+        .text-muted {
+            color: var(--dark-gray) !important;
+        }
+        
+        .total-badge {
+            background: var(--primary-color);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+        
+        @media (max-width: 768px) {
+            .stat-number {
+                font-size: 2rem;
+            }
+            
+            .custom-icon {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .header-section {
+                padding: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            .display-5 {
+                font-size: 1.8rem;
+            }
+        }
+        
+        .section-divider {
+            border-top: 1px solid var(--medium-gray);
+            margin: 2rem 0;
+        }
+        
+        .action-card {
+            background: white;
+            border: 1px solid var(--medium-gray);
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Principal -->
+    <div class="container py-4">
+        <div class="header-section">
+            <div class="row align-items-center">
+                <div class="col-lg-10 col-md-9">
+                    <h1 class="display-5 fw-bold mb-2">Mapa Comercial Carnes San Martín</h1>
+                    <p class="lead mb-0 text-muted">Sistema de gestión de ubicaciones comerciales en Costa Rica</p>
+                    <div class="mt-2">
+                        <span class="badge bg-light text-dark border">
+                            <i class="fas fa-sync-alt me-1"></i>Actualizado en tiempo real
+                        </span>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-3 text-center text-md-end">
+                    <div class="total-badge">
+                        <small class="d-block opacity-75">Total</small>
+                        <strong class="h4 mb-0">{{ stats.total_general }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tarjetas de Estadísticas -->
+        <div class="row g-4 mb-5">
+            <!-- Distribuidores Autorizados -->
+            <div class="col-md-4">
+                <div class="card card-hover border-subtle">
+                    <div class="card-body text-center p-4">
+                        <div class="custom-icon">
+                            <img src="/static/images/mi-icono-distribuidor.png" alt="Distribuidores Autorizados">
+                        </div>
+                        <h5 class="card-title">Distribuidores Autorizados</h5>
+                        <h2 class="stat-number">{{ stats.distribuidores }}</h2>
+                        <p class="card-text">Puntos de distribución principal</p>
+                        <div class="mt-3">
+                            <span class="badge bg-light text-dark border">
+                                <i class="fas fa-check me-1"></i>Activos
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tiendas de Oro -->
+            <div class="col-md-4">
+                <div class="card card-hover border-subtle">
+                    <div class="card-body text-center p-4">
+                        <div class="custom-icon">
+                            <img src="/static/images/logo-dorado-activo.png" alt="Tiendas de Oro">
+                        </div>
+                        <h5 class="card-title">Tiendas de Oro</h5>
+                        <h2 class="stat-number">{{ stats.tiendas_oro }}</h2>
+                        <p class="card-text">Congeladores especializados</p>
+                        <div class="mt-3">
+                            <span class="badge bg-light text-dark border">
+                                <i class="fas fa-thermometer-half me-1"></i>Control temperatura
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tiendas Satélite -->
+            <div class="col-md-4">
+                <div class="card card-hover border-subtle">
+                    <div class="card-body text-center p-4">
+                        <div class="custom-icon">
+                            <img src="/static/images/logo-azul-activo.png" alt="Tiendas Satélite">
+                        </div>
+                        <h5 class="card-title">Tiendas Satélite</h5>
+                        <h2 class="stat-number">{{ stats.tiendas_satelite }}</h2>
+                        <p class="card-text">Puntos de venta asociados</p>
+                        <div class="mt-3">
+                            <span class="badge bg-light text-dark border">
+                                <i class="fas fa-network-wired me-1"></i>Red comercial
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel de Acciones -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="action-card">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h4 class="card-title mb-1">Mapa Interactivo</h4>
+                            <p class="card-text text-muted mb-0">
+                                Visualice y gestione todas las ubicaciones comerciales en un mapa interactivo.
+                            </p>
+                        </div>
+                        <div class="col-md-4 text-md-end">
+                            <a href="/mapa" class="btn btn-modern">
+                                <i class="fas fa-map-marked-alt me-2"></i>Abrir Mapa
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- Footer -->
+        <div class="row mt-4">
+            <div class="col-12 text-center">
+                <p class="text-muted">
+                    <small>
+                        <i class="fas fa-info-circle me-1"></i>
+                        Utilice el control de capas en el mapa para filtrar por tipo de ubicación
+                    </small>
+                </p>
+                <p class="text-muted">
+                    <small>
+                        Sistema desarrollado para <strong>Carnes San Martín</strong> | 
+                        <i class="fas fa-map-marker-alt me-1"></i>Costa Rica
+                    </small>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Efectos interactivos adicionales
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animación para las tarjetas al hacer scroll
+            const cards = document.querySelectorAll('.card-hover');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            cards.forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(card);
+            });
+        });
+    </script>
+</body>
+</html>

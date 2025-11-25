@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa Comercial - Carnes San Martín</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        .header {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: white;
+            padding: 12px 18px;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+            z-index: 1001;
+            max-width: 320px;
+            border: 1px solid #e9ecef;
+        }
+        .home-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #2c3e50;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 6px;
+            text-decoration: none;
+            z-index: 1001;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            white-space: nowrap;
+        }
+        .home-btn:hover {
+            background: #3498db;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
+            color: white;
+        }
+        #map {
+            height: 100vh;
+            width: 100vw;
+        }
+        .header h3 {
+            margin: 0;
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        .header p {
+            margin: 4px 0 0 0;
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        .legend-info {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #e9ecef;
+            font-size: 0.75rem;
+            color: #6c757d;
+        }
+
+        /* 🔥 SELECTOR DE CAPAS EXTRA GRANDE Y VISIBLE */
+        .leaflet-control-layers {
+            font-size: 18px !important; /* Más grande */
+            border: 3px solid #2c3e50 !important; /* Borde más visible */
+            border-radius: 10px !important;
+            background: white !important;
+            padding: 25px !important; /* Más padding */
+            min-width: 320px !important; /* Más ancho */
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2) !important; /* Sombra más pronunciada */
+            margin-top: 120px !important;
+            margin-left: 15px !important;
+        }
+
+        .leaflet-control-layers-toggle {
+            width: 44px !important; /* Más grande */
+            height: 44px !important;
+            background-size: 28px 28px !important;
+            background-position: center !important;
+        }
+
+        .leaflet-control-layers-list {
+            font-size: 16px !important; /* Texto más grande */
+            line-height: 1.6 !important; /* Más espacio entre líneas */
+        }
+
+        .leaflet-control-layers label {
+            font-size: 16px !important; /* Texto más grande */
+            margin-bottom: 12px !important; /* Más espacio entre opciones */
+            padding: 8px 0 !important; /* Más padding vertical */
+            display: flex !important;
+            align-items: center !important;
+            cursor: pointer !important;
+            border-bottom: 2px solid #f0f0f0 !important; /* Línea más gruesa */
+            font-weight: 500 !important; /* Texto en negrita */
+        }
+
+        .leaflet-control-layers label:last-child {
+            border-bottom: none !important;
+        }
+
+        .leaflet-control-layers input[type="checkbox"] {
+            width: 26px !important; /* Checkbox más grande */
+            height: 26px !important;
+            margin-right: 50px !important; /* Más espacio del checkbox al texto */
+            cursor: pointer !important;
+            transform: scale(1.2); /* Efecto de agrandamiento */
+        }
+
+        .leaflet-control-layers span {
+            font-weight: 600 !important; /* Texto más negrita */
+            color: #2c3e50 !important;
+            font-size: 16px !important;
+        }
+
+        .leaflet-control-layers-expanded {
+            padding: 80px !important; /* Más padding interno */
+        }
+
+        .leaflet-control-layers-base {
+            margin-bottom: 50px !important; /* Más espacio entre grupos */
+        }
+
+        .leaflet-control-layers-overlays {
+            margin-top: 50px !important; /* Más espacio entre grupos */
+        }
+
+        .leaflet-control-layers-separator {
+            height: 3px !important; /* Separador más grueso */
+            background: #e9ecef !important;
+            margin: 18px 0 !important; /* Más espacio alrededor del separador */
+            border-radius: 2px !important;
+        }
+
+        /* Efecto hover más pronunciado */
+        .leaflet-control-layers label:hover {
+            background-color: #f8f9fa !important;
+            border-radius: 6px !important; /* Bordes más redondeados */
+            padding-left: 12px !important; /* Más padding en hover */
+            margin-left: -12px !important;
+            margin-right: -12px !important;
+            transform: translateX(5px); /* Efecto de movimiento */
+            transition: all 0.2s ease !important;
+        }
+
+        /* Título del selector más destacado */
+        .leaflet-control-layers h4 {
+            font-size: 18px !important;
+            font-weight: 700 !important;
+            color: #2c3e50 !important;
+            margin-bottom: 15px !important;
+            text-align: center !important;
+            border-bottom: 2px solid #3498db !important;
+            padding-bottom: 8px !important;
+        }
+
+        /* Posición específica para el control en topleft */
+        .leaflet-top.leaflet-left {
+            top: 120px !important;
+            left: 15px !important;
+        }
+
+        .leaflet-control-container .leaflet-top.leaflet-left {
+            margin-top: 10px !important;
+        }
+
+        /* Responsive para móviles */
+        @media (max-width: 768px) {
+            .header {
+                max-width: 250px;
+                padding: 10px 12px;
+            }
+            
+            .leaflet-control-layers {
+                min-width: 240px !important;
+                padding: 16px !important;
+                margin-top: 100px !important;
+                font-size: 15px !important;
+            }
+            
+            .leaflet-control-layers label {
+                font-size: 15px !important;
+                margin-bottom: 10px !important;
+            }
+            
+            .leaflet-top.leaflet-left {
+                top: 100px !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                max-width: 200px;
+            }
+            .home-btn {
+                padding: 6px 10px;
+                font-size: 0.8rem;
+            }
+            .home-btn span {
+                display: none;
+            }
+            
+            .leaflet-control-layers {
+                min-width: 200px !important;
+                font-size: 14px !important;
+                margin-top: 90px !important;
+                padding: 12px !important;
+            }
+            
+            .leaflet-control-layers label {
+                font-size: 14px !important;
+                margin-bottom: 8px !important;
+            }
+            
+            .leaflet-control-layers input[type="checkbox"] {
+                width: 20px !important;
+                height: 20px !important;
+            }
+            
+            .leaflet-top.leaflet-left {
+                top: 90px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    
+    <a href="/" class="home-btn">
+        <i class="fas fa-home"></i> <span>Volver al Inicio</span>
+    </a>
+    
+    <!-- El mapa se renderiza aquí directamente -->
+    <div id="map">
+        {{ mapa_html|safe }}
+    </div>
+</body>
+</html>

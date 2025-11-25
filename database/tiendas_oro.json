@@ -1,0 +1,30 @@
+[
+  {
+    "id": "ORO-001",
+    "nombre": "TIENDA ORO SAN RAFAEL",
+    "ciudad": "SAN RAFAEL DE HEREDIA", 
+    "lat": 10.01310191,
+    "lon": -84.09848401,
+    "direccion": "SAN RAFAEL DE HEREDIA",
+    "telefono": "2234-5678",
+    "estado": "activo",
+    "fecha_apertura": "2024-02-01",
+    "capacidad_congelador": "250L",
+    "ultima_visita": "2024-01-15",
+    "responsable": "Carlos López"
+  },
+  {
+    "id": "ORO-002",
+    "nombre": "TIENDA ORO ESCAZÚ",
+    "ciudad": "ESCAZÚ",
+    "lat": 9.9189,
+    "lon": -84.1367,
+    "direccion": "CENTRO COMERCIAL ESCAZÚ",
+    "telefono": "2289-1234",
+    "estado": "en_construccion", 
+    "fecha_apertura": "2025-06-01",
+    "capacidad_congelador": "300L",
+    "ultima_visita": null,
+    "responsable": "Ana Martínez"
+  }
+]

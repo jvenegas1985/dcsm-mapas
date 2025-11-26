@@ -1,1 +1,12 @@
-[]
+[
+    {
+        "nombre": "TIENDA SATELITE EJEMPLO",
+        "ciudad": "PUNTARENAS",
+        "direccion": "PUNTARENAS",
+        "tipo_satelite": "TIENDA SATELITE",
+        "estado": "activo",
+        "lat": 9.609430705942222,
+        "lon": -84.10046028721031,
+        "id": "TS001"
+    }
+]

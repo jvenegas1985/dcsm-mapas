@@ -1,0 +1,11 @@
+[build]
+  command = "echo 'No build needed'"
+  publish = "/"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[build.environment]
+  FLASK_ENV = "production"

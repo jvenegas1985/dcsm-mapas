@@ -152,20 +152,33 @@ def obtener_icono_personalizado(estado, tipo):
     # Obtener el nombre del archivo de icono
     nombre_icono = iconos_config.get(tipo, {}).get(estado_clave, 'logo-rojo-activo.png')
     
-    # RUTA FÍSICA del archivo de icono
+    # RUTA FÍSICA del archivo de icono (corregido)
     ruta_icono = os.path.join(BASE_DIR, 'static', 'images', nombre_icono)
     
     # Verificar que el archivo existe
     if not os.path.exists(ruta_icono):
         print(f"⚠️  Icono no encontrado: {ruta_icono}")
-        # Usar un icono por defecto de Folium
+        # Usar un icono por defecto de Folium como fallback
         return folium.Icon(color='red', icon='info-sign')
     
-    # Crear el icono personalizado con la ruta física
+    # 🔥 TAMAÑOS ESPECÍFICOS POR TIPO
+    if tipo == 'tiendas_oro':
+        # Iconos dorados MÁS PEQUEÑOS
+        icon_size = (42, 42)      # 🔥 MÁS PEQUEÑO
+        icon_anchor = (21, 21)    # 🔥 MITAD DEL TAMAÑO
+    elif tipo == 'tiendas_satelite':
+        # Iconos azules MÁS PEQUEÑOS  
+        icon_size = (42, 42)      # 🔥 MÁS PEQUEÑO
+        icon_anchor = (21, 21)    # 🔥 MITAD DEL TAMAÑO
+    else:
+        # Distribuidores - tamaño estándar pequeño
+        icon_size = (65, 65)      # 🔥 MÁS PEQUEÑO que el original
+        icon_anchor = (29, 29)    # 🔥 MITAD DEL TAMAÑO
+    
     icono_personalizado = folium.CustomIcon(
-        icon_image=ruta_icono,  # Ruta física del archivo
-        icon_size=(60, 60),
-        icon_anchor=(30, 30)
+        icon_image=ruta_icono,
+        icon_size=icon_size,
+        icon_anchor=icon_anchor
     )
     
     return icono_personalizado
@@ -559,6 +572,12 @@ def verificar_iconos():
             html += f'<img src="/static/images/{resultado["icono"]}" style="width: 50px; margin: 5px;">'
     
     return html
+
+
+
+
+
+
 
 if __name__ == '__main__':
     # Crear directorios si no existen

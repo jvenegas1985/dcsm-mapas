@@ -1,17 +1,80 @@
-from flask import Flask, render_template, request, jsonify, send_from_directory
+from flask import Flask, render_template, request, jsonify, send_from_directory, session, redirect
 import folium
 import json
 import os
 from datetime import datetime, date
 
 app = Flask(__name__)
+app.secret_key = 'clave_secreta_mantenimiento_2025'  # IMPORTANTE: Agregar secret key
+
 DATABASE_PATH = 'database'
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# PIN hardcodeado
+MAINTENANCE_PIN = "2025"
 
 # Ruta para archivos estáticos
 @app.route('/static/<path:path>')
 def serve_static(path):
     return send_from_directory('static', path)
+
+@app.route('/acceso-mantenimiento')
+def acceso_mantenimiento():
+    """Página de acceso con PIN"""
+    return '''
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Acceso Mantenimiento</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+        <style>
+            body { background: #f8f9fa; }
+            .login-box { max-width: 400px; margin: 100px auto; padding: 2rem; background: white; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        </style>
+    </head>
+    <body>
+        <div class="login-box">
+            <h4 class="text-center mb-4">🔒 Acceso Mantenimiento</h4>
+            <form method="POST" action="/verificar-pin">
+                <div class="mb-3">
+                    <label class="form-label">PIN de 4 dígitos:</label>
+                    <input type="password" name="pin" class="form-control" maxlength="4" pattern="[0-9]{4}" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Acceder</button>
+            </form>
+            ''' + ('<div class="alert alert-danger mt-3">PIN incorrecto</div>' if request.args.get('error') else '') + '''
+            <div class="text-center mt-3">
+                <a href="/" class="text-muted">← Volver al inicio</a>
+            </div>
+        </div>
+    </body>
+    </html>
+    '''
+
+@app.route('/verificar-pin', methods=['POST'])
+def verificar_pin():
+    """Verificar el PIN"""
+    pin_ingresado = request.form.get('pin')
+    
+    if pin_ingresado == MAINTENANCE_PIN:
+        session['mantenimiento_autorizado'] = True
+        return redirect('/mantenimiento')
+    else:
+        return redirect('/acceso-mantenimiento?error=1')
+
+# ESTA ES LA ÚNICA FUNCIÓN mantenimiento() - PROTEGIDA
+@app.route('/mantenimiento')
+def mantenimiento():
+    """Página principal de mantenimiento (protegida)"""
+    if not session.get('mantenimiento_autorizado'):
+        return redirect('/acceso-mantenimiento')
+    return render_template('mantenimiento.html')
+
+@app.route('/logout-mantenimiento')
+def logout_mantenimiento():
+    """Cerrar sesión de mantenimiento"""
+    session.pop('mantenimiento_autorizado', None)
+    return redirect('/')
 
 def cargar_datos_desde_json(archivo):
     """Carga datos desde JSON"""
@@ -21,6 +84,17 @@ def cargar_datos_desde_json(archivo):
             return json.load(f)
     except:
         return []
+
+def guardar_datos_en_json(archivo, datos):
+    """Guarda datos en JSON"""
+    try:
+        ruta_archivo = os.path.join(DATABASE_PATH, archivo)
+        with open(ruta_archivo, 'w', encoding='utf-8') as f:
+            json.dump(datos, f, indent=4, ensure_ascii=False)
+        return True
+    except Exception as e:
+        print(f"Error guardando {archivo}: {e}")
+        return False
 
 def obtener_estadisticas_totales():
     """Estadísticas totales por tipo"""
@@ -241,6 +315,209 @@ def agregar_capa_tiendas_satelite(mapa):
         ).add_to(feature_group)
     
     feature_group.add_to(mapa)
+
+# ============================================================================
+# RUTAS DE MANTENIMIENTO (CRUD) - PROTEGIDAS
+# ============================================================================
+
+# RUTAS PARA DISTRIBUIDORES AUTORIZADOS
+@app.route('/api/distribuidores', methods=['GET'])
+def get_distribuidores():
+    """Obtener todos los distribuidores"""
+    if not session.get('mantenimiento_autorizado'):
+        return jsonify({'error': 'No autorizado'}), 401
+    distribuidores = cargar_datos_desde_json('distribuidores_autorizados.json')
+    return jsonify(distribuidores)
+
+@app.route('/api/distribuidores', methods=['POST'])
+def crear_distribuidor():
+    """Crear nuevo distribuidor"""
+    if not session.get('mantenimiento_autorizado'):
+        return jsonify({'error': 'No autorizado'}), 401
+    datos = request.get_json()
+    distribuidores = cargar_datos_desde_json('distribuidores_autorizados.json')
+    
+    # Generar ID único
+    nuevo_id = f"D{len(distribuidores) + 1:03d}"
+    datos['id'] = nuevo_id
+    
+    distribuidores.append(datos)
+    
+    if guardar_datos_en_json('distribuidores_autorizados.json', distribuidores):
+        return jsonify({'success': True, 'id': nuevo_id})
+    else:
+        return jsonify({'success': False, 'error': 'Error al guardar'}), 500
+
+@app.route('/api/distribuidores/<distribuidor_id>', methods=['PUT'])
+def actualizar_distribuidor(distribuidor_id):
+    """Actualizar distribuidor existente"""
+    if not session.get('mantenimiento_autorizado'):
+        return jsonify({'error': 'No autorizado'}), 401
+    datos = request.get_json()
+    distribuidores = cargar_datos_desde_json('distribuidores_autorizados.json')
+    
+    for i, distribuidor in enumerate(distribuidores):
+        if distribuidor['id'] == distribuidor_id:
+            # Asegurarse de que el ID se mantenga
+            datos['id'] = distribuidor_id
+            distribuidores[i] = datos
+            if guardar_datos_en_json('distribuidores_autorizados.json', distribuidores):
+                return jsonify({'success': True})
+            else:
+                return jsonify({'success': False, 'error': 'Error al guardar'}), 500
+    
+    return jsonify({'success': False, 'error': 'Distribuidor no encontrado'}), 404
+
+@app.route('/api/distribuidores/<distribuidor_id>', methods=['DELETE'])
+def eliminar_distribuidor(distribuidor_id):
+    """Eliminar distribuidor"""
+    if not session.get('mantenimiento_autorizado'):
+        return jsonify({'error': 'No autorizado'}), 401
+    distribuidores = cargar_datos_desde_json('distribuidores_autorizados.json')
+    
+    for i, distribuidor in enumerate(distribuidores):
+        if distribuidor['id'] == distribuidor_id:
+            distribuidores.pop(i)
+            if guardar_datos_en_json('distribuidores_autorizados.json', distribuidores):
+                return jsonify({'success': True})
+            else:
+                return jsonify({'success': False, 'error': 'Error al guardar'}), 500
+    
+    return jsonify({'success': False, 'error': 'Distribuidor no encontrado'}), 404
+
+# RUTAS PARA TIENDAS ORO
+@app.route('/api/tiendas-oro', methods=['GET'])
+def get_tiendas_oro():
+    """Obtener todas las tiendas oro"""
+    if not session.get('mantenimiento_autorizado'):
+        return jsonify({'error': 'No autorizado'}), 401
+    tiendas = cargar_datos_desde_json('tiendas_oro.json')
+    return jsonify(tiendas)
+
+@app.route('/api/tiendas-oro', methods=['POST'])
+def crear_tienda_oro():
+    """Crear nueva tienda oro"""
+    if not session.get('mantenimiento_autorizado'):
+        return jsonify({'error': 'No autorizado'}), 401
+    datos = request.get_json()
+    tiendas = cargar_datos_desde_json('tiendas_oro.json')
+    
+    # Generar ID único
+    nuevo_id = f"TO{len(tiendas) + 1:03d}"
+    datos['id'] = nuevo_id
+    
+    tiendas.append(datos)
+    
+    if guardar_datos_en_json('tiendas_oro.json', tiendas):
+        return jsonify({'success': True, 'id': nuevo_id})
+    else:
+        return jsonify({'success': False, 'error': 'Error al guardar'}), 500
+
+@app.route('/api/tiendas-oro/<tienda_id>', methods=['PUT'])
+def actualizar_tienda_oro(tienda_id):
+    """Actualizar tienda oro existente"""
+    if not session.get('mantenimiento_autorizado'):
+        return jsonify({'error': 'No autorizado'}), 401
+    datos = request.get_json()
+    tiendas = cargar_datos_desde_json('tiendas_oro.json')
+    
+    for i, tienda in enumerate(tiendas):
+        if tienda['id'] == tienda_id:
+            # Asegurarse de que el ID se mantenga
+            datos['id'] = tienda_id
+            tiendas[i] = datos
+            if guardar_datos_en_json('tiendas_oro.json', tiendas):
+                return jsonify({'success': True})
+            else:
+                return jsonify({'success': False, 'error': 'Error al guardar'}), 500
+    
+    return jsonify({'success': False, 'error': 'Tienda no encontrada'}), 404
+
+@app.route('/api/tiendas-oro/<tienda_id>', methods=['DELETE'])
+def eliminar_tienda_oro(tienda_id):
+    """Eliminar tienda oro"""
+    if not session.get('mantenimiento_autorizado'):
+        return jsonify({'error': 'No autorizado'}), 401
+    tiendas = cargar_datos_desde_json('tiendas_oro.json')
+    
+    for i, tienda in enumerate(tiendas):
+        if tienda['id'] == tienda_id:
+            tiendas.pop(i)
+            if guardar_datos_en_json('tiendas_oro.json', tiendas):
+                return jsonify({'success': True})
+            else:
+                return jsonify({'success': False, 'error': 'Error al guardar'}), 500
+    
+    return jsonify({'success': False, 'error': 'Tienda no encontrada'}), 404
+
+# RUTAS PARA TIENDAS SATÉLITE
+@app.route('/api/tiendas-satelite', methods=['GET'])
+def get_tiendas_satelite():
+    """Obtener todas las tiendas satélite"""
+    if not session.get('mantenimiento_autorizado'):
+        return jsonify({'error': 'No autorizado'}), 401
+    tiendas = cargar_datos_desde_json('tiendas_satelite.json')
+    return jsonify(tiendas)
+
+@app.route('/api/tiendas-satelite', methods=['POST'])
+def crear_tienda_satelite():
+    """Crear nueva tienda satélite"""
+    if not session.get('mantenimiento_autorizado'):
+        return jsonify({'error': 'No autorizado'}), 401
+    datos = request.get_json()
+    tiendas = cargar_datos_desde_json('tiendas_satelite.json')
+    
+    # Generar ID único
+    nuevo_id = f"TS{len(tiendas) + 1:03d}"
+    datos['id'] = nuevo_id
+    
+    tiendas.append(datos)
+    
+    if guardar_datos_en_json('tiendas_satelite.json', tiendas):
+        return jsonify({'success': True, 'id': nuevo_id})
+    else:
+        return jsonify({'success': False, 'error': 'Error al guardar'}), 500
+
+@app.route('/api/tiendas-satelite/<tienda_id>', methods=['PUT'])
+def actualizar_tienda_satelite(tienda_id):
+    """Actualizar tienda satélite existente"""
+    if not session.get('mantenimiento_autorizado'):
+        return jsonify({'error': 'No autorizado'}), 401
+    datos = request.get_json()
+    tiendas = cargar_datos_desde_json('tiendas_satelite.json')
+    
+    for i, tienda in enumerate(tiendas):
+        if tienda['id'] == tienda_id:
+            # Asegurarse de que el ID se mantenga
+            datos['id'] = tienda_id
+            tiendas[i] = datos
+            if guardar_datos_en_json('tiendas_satelite.json', tiendas):
+                return jsonify({'success': True})
+            else:
+                return jsonify({'success': False, 'error': 'Error al guardar'}), 500
+    
+    return jsonify({'success': False, 'error': 'Tienda no encontrada'}), 404
+
+@app.route('/api/tiendas-satelite/<tienda_id>', methods=['DELETE'])
+def eliminar_tienda_satelite(tienda_id):
+    """Eliminar tienda satélite"""
+    if not session.get('mantenimiento_autorizado'):
+        return jsonify({'error': 'No autorizado'}), 401
+    tiendas = cargar_datos_desde_json('tiendas_satelite.json')
+    
+    for i, tienda in enumerate(tiendas):
+        if tienda['id'] == tienda_id:
+            tiendas.pop(i)
+            if guardar_datos_en_json('tiendas_satelite.json', tiendas):
+                return jsonify({'success': True})
+            else:
+                return jsonify({'success': False, 'error': 'Error al guardar'}), 500
+    
+    return jsonify({'success': False, 'error': 'Tienda no encontrada'}), 404
+
+# ============================================================================
+# RUTAS PRINCIPALES
+# ============================================================================
 
 @app.route('/')
 def index():

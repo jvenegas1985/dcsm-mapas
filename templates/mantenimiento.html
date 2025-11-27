@@ -41,7 +41,10 @@
             <div class="col-md-3 col-lg-2 sidebar">
                 <h4 class="mb-4">🛠️ Mantenimiento</h4>
                 <nav class="nav flex-column">
-                    <a class="nav-link active" href="#" data-target="distribuidores">
+                    <a class="nav-link active" href="#" data-target="centros-distribucion">
+                        <i class="fas fa-warehouse me-2"></i>Centros Distribución
+                    </a>
+                    <a class="nav-link" href="#" data-target="distribuidores">
                         <i class="fas fa-truck me-2"></i>Distribuidores
                     </a>
                     <a class="nav-link" href="#" data-target="tiendas-oro">
@@ -57,17 +60,47 @@
                     <a class="nav-link" href="/mapa">
                         <i class="fas fa-globe me-2"></i>Mapa Completo
                     </a>
-                                <a class="nav-link text-danger" href="/logout-mantenimiento">
-    <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
-</a>
+                    <a class="nav-link text-danger" href="/logout-mantenimiento">
+                        <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
+                    </a>
                 </nav>
             </div>
 
-
             <!-- Main Content -->
             <div class="col-md-9 col-lg-10 ms-sm-auto px-4 py-4">
+                <!-- Centros Distribución Section -->
+                <div id="centros-distribucion" class="content-section active">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>🏭 Centros de Distribución</h2>
+                        <button class="btn btn-primary" onclick="abrirModalCentroDistribucion()">
+                            <i class="fas fa-plus me-2"></i>Nuevo Centro
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover" id="tablaCentrosDistribucion">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Ciudad</th>
+                                    <th>Dirección</th>
+                                    <th>Estado</th>
+                                    <th>Teléfono</th>
+                                    <th>Capacidad</th>
+                                    <th>Tipo</th>
+                                    <th>Fecha Apertura</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyCentrosDistribucion">
+                                <!-- Los datos se cargan con JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
                 <!-- Distribuidores Section -->
-                <div id="distribuidores" class="content-section active">
+                <div id="distribuidores" class="content-section">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h2>📦 Distribuidores Autorizados</h2>
                         <button class="btn btn-primary" onclick="abrirModalDistribuidor()">
@@ -84,6 +117,7 @@
                                     <th>Dirección</th>
                                     <th>Estado</th>
                                     <th>Teléfono</th>
+                                    <th>Fecha Apertura</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
@@ -112,6 +146,7 @@
                                     <th>Dirección</th>
                                     <th>Estado</th>
                                     <th>Capacidad Congelador</th>
+                                    <th>Fecha Apertura</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
@@ -140,6 +175,7 @@
                                     <th>Dirección</th>
                                     <th>Estado</th>
                                     <th>Tipo</th>
+                                    <th>Fecha Apertura</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
@@ -153,188 +189,285 @@
         </div>
     </div>
 
-    <!-- Modal para Distribuidores - COORDENADAS MODIFICADAS -->
-<div class="modal fade" id="modalDistribuidor" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalDistribuidorTitle">Nuevo Distribuidor</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form id="formDistribuidor">
-                    <input type="hidden" id="distribuidorId">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">Nombre *</label>
-                                <input type="text" class="form-control" id="distribuidorNombre" required>
+    <!-- Modal para Centros de Distribución -->
+    <div class="modal fade" id="modalCentroDistribucion" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalCentroDistribucionTitle">Nuevo Centro de Distribución</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formCentroDistribucion">
+                        <input type="hidden" id="centroDistribucionId">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Nombre *</label>
+                                    <input type="text" class="form-control" id="centroDistribucionNombre" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Ciudad *</label>
+                                    <input type="text" class="form-control" id="centroDistribucionCiudad" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Dirección *</label>
+                                    <input type="text" class="form-control" id="centroDistribucionDireccion" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Teléfono</label>
+                                    <input type="text" class="form-control" id="centroDistribucionTelefono">
+                                </div>
                             </div>
-                            <div class="mb-3">
-                                <label class="form-label">Ciudad *</label>
-                                <input type="text" class="form-control" id="distribuidorCiudad" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Dirección *</label>
-                                <input type="text" class="form-control" id="distribuidorDireccion" required>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">Teléfono</label>
-                                <input type="text" class="form-control" id="distribuidorTelefono">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Estado *</label>
-                                <select class="form-control" id="distribuidorEstado" required>
-                                    <option value="activo">Activo</option>
-                                    <option value="planeado">Planeado</option>
-                                    <option value="proxima_apertura">Próxima Apertura</option>
-                                    <option value="en_construccion">En Construcción</option>
-                                </select>
-                            </div>
-                            <!-- COORDENADAS EN UNA SOLA LÍNEA -->
-                            <div class="mb-3">
-                                <label class="form-label">Coordenadas (Lat, Lon) *</label>
-                                <input type="text" class="form-control" id="distribuidorCoordenadas" 
-                                       placeholder="9.975297813537146, -84.12769671986695" required>
-                                <div class="form-text">
-                                    <i class="fas fa-info-circle"></i> Copia y pega las coordenadas desde Google Maps
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Capacidad Almacén</label>
+                                    <input type="text" class="form-control" id="centroDistribucionCapacidad" placeholder="5000 m²">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Tipo Centro *</label>
+                                    <select class="form-control" id="centroDistribucionTipo" required>
+                                        <option value="Principal">Principal</option>
+                                        <option value="Regional">Regional</option>
+                                        <option value="Local">Local</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Estado *</label>
+                                    <select class="form-control" id="centroDistribucionEstado" required>
+                                        <option value="activo">Activo</option>
+                                        <option value="planeado">Planeado</option>
+                                        <option value="proxima_apertura">Próxima Apertura</option>
+                                        <option value="en_construccion">En Construcción</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Fecha de Apertura *</label>
+                                    <input type="date" class="form-control" id="centroDistribucionFechaApertura" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Coordenadas (Lat, Lon) *</label>
+                                    <input type="text" class="form-control" id="centroDistribucionCoordenadas" 
+                                           placeholder="9.975297813537146, -84.12769671986695" required>
+                                    <div class="form-text">
+                                        <i class="fas fa-info-circle"></i> Copia y pega las coordenadas desde Google Maps
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" onclick="guardarDistribuidor()">Guardar</button>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Zona de Cobertura</label>
+                                    <input type="text" class="form-control" id="centroDistribucionZonaCobertura" placeholder="Distribución Nacional">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Responsable</label>
+                                    <input type="text" class="form-control" id="centroDistribucionResponsable" placeholder="Director Logística">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="guardarCentroDistribucion()">Guardar</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Modal para Tiendas Oro - COORDENADAS MODIFICADAS -->
-<div class="modal fade" id="modalTiendaOro" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalTiendaOroTitle">Nueva Tienda Oro</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form id="formTiendaOro">
-                    <input type="hidden" id="tiendaOroId">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">Nombre *</label>
-                                <input type="text" class="form-control" id="tiendaOroNombre" required>
+    <!-- Modal para Distribuidores -->
+    <div class="modal fade" id="modalDistribuidor" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalDistribuidorTitle">Nuevo Distribuidor</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formDistribuidor">
+                        <input type="hidden" id="distribuidorId">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Nombre *</label>
+                                    <input type="text" class="form-control" id="distribuidorNombre" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Ciudad *</label>
+                                    <input type="text" class="form-control" id="distribuidorCiudad" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Dirección *</label>
+                                    <input type="text" class="form-control" id="distribuidorDireccion" required>
+                                </div>
                             </div>
-                            <div class="mb-3">
-                                <label class="form-label">Ciudad *</label>
-                                <input type="text" class="form-control" id="tiendaOroCiudad" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Dirección *</label>
-                                <input type="text" class="form-control" id="tiendaOroDireccion" required>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">Capacidad Congelador</label>
-                                <input type="text" class="form-control" id="tiendaOroCapacidad">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Estado *</label>
-                                <select class="form-control" id="tiendaOroEstado" required>
-                                    <option value="activo">Activo</option>
-                                    <option value="planeado">Planeado</option>
-                                    <option value="proxima_apertura">Próxima Apertura</option>
-                                    <option value="en_construccion">En Construcción</option>
-                                </select>
-                            </div>
-                            <!-- COORDENADAS EN UNA SOLA LÍNEA -->
-                            <div class="mb-3">
-                                <label class="form-label">Coordenadas (Lat, Lon) *</label>
-                                <input type="text" class="form-control" id="tiendaOroCoordenadas" 
-                                       placeholder="9.975297813537146, -84.12769671986695" required>
-                                <div class="form-text">
-                                    <i class="fas fa-info-circle"></i> Copia y pega las coordenadas desde Google Maps
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Teléfono</label>
+                                    <input type="text" class="form-control" id="distribuidorTelefono">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Estado *</label>
+                                    <select class="form-control" id="distribuidorEstado" required>
+                                        <option value="activo">Activo</option>
+                                        <option value="planeado">Planeado</option>
+                                        <option value="proxima_apertura">Próxima Apertura</option>
+                                        <option value="en_construccion">En Construcción</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Fecha de Apertura *</label>
+                                    <input type="date" class="form-control" id="distribuidorFechaApertura" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Coordenadas (Lat, Lon) *</label>
+                                    <input type="text" class="form-control" id="distribuidorCoordenadas" 
+                                           placeholder="9.975297813537146, -84.12769671986695" required>
+                                    <div class="form-text">
+                                        <i class="fas fa-info-circle"></i> Copia y pega las coordenadas desde Google Maps
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" onclick="guardarTiendaOro()">Guardar</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="guardarDistribuidor()">Guardar</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Modal para Tiendas Satélite - COORDENADAS MODIFICADAS -->
-<div class="modal fade" id="modalTiendaSatelite" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalTiendaSateliteTitle">Nueva Tienda Satélite</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form id="formTiendaSatelite">
-                    <input type="hidden" id="tiendaSateliteId">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">Nombre *</label>
-                                <input type="text" class="form-control" id="tiendaSateliteNombre" required>
+    <!-- Modal para Tiendas Oro -->
+    <div class="modal fade" id="modalTiendaOro" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTiendaOroTitle">Nueva Tienda Oro</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formTiendaOro">
+                        <input type="hidden" id="tiendaOroId">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Nombre *</label>
+                                    <input type="text" class="form-control" id="tiendaOroNombre" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Ciudad *</label>
+                                    <input type="text" class="form-control" id="tiendaOroCiudad" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Dirección *</label>
+                                    <input type="text" class="form-control" id="tiendaOroDireccion" required>
+                                </div>
                             </div>
-                            <div class="mb-3">
-                                <label class="form-label">Ciudad *</label>
-                                <input type="text" class="form-control" id="tiendaSateliteCiudad" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Dirección *</label>
-                                <input type="text" class="form-control" id="tiendaSateliteDireccion" required>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">Tipo Satélite</label>
-                                <input type="text" class="form-control" id="tiendaSateliteTipo">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Estado *</label>
-                                <select class="form-control" id="tiendaSateliteEstado" required>
-                                    <option value="activo">Activo</option>
-                                    <option value="planeado">Planeado</option>
-                                    <option value="proxima_apertura">Próxima Apertura</option>
-                                    <option value="en_construccion">En Construcción</option>
-                                </select>
-                            </div>
-                            <!-- COORDENADAS EN UNA SOLA LÍNEA -->
-                            <div class="mb-3">
-                                <label class="form-label">Coordenadas (Lat, Lon) *</label>
-                                <input type="text" class="form-control" id="tiendaSateliteCoordenadas" 
-                                       placeholder="9.975297813537146, -84.12769671986695" required>
-                                <div class="form-text">
-                                    <i class="fas fa-info-circle"></i> Copia y pega las coordenadas desde Google Maps
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Capacidad Congelador</label>
+                                    <input type="text" class="form-control" id="tiendaOroCapacidad">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Estado *</label>
+                                    <select class="form-control" id="tiendaOroEstado" required>
+                                        <option value="activo">Activo</option>
+                                        <option value="planeado">Planeado</option>
+                                        <option value="proxima_apertura">Próxima Apertura</option>
+                                        <option value="en_construccion">En Construcción</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Fecha de Apertura *</label>
+                                    <input type="date" class="form-control" id="tiendaOroFechaApertura" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Coordenadas (Lat, Lon) *</label>
+                                    <input type="text" class="form-control" id="tiendaOroCoordenadas" 
+                                           placeholder="9.975297813537146, -84.12769671986695" required>
+                                    <div class="form-text">
+                                        <i class="fas fa-info-circle"></i> Copia y pega las coordenadas desde Google Maps
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" onclick="guardarTiendaSatelite()">Guardar</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="guardarTiendaOro()">Guardar</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
+
+    <!-- Modal para Tiendas Satélite -->
+    <div class="modal fade" id="modalTiendaSatelite" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTiendaSateliteTitle">Nueva Tienda Satélite</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formTiendaSatelite">
+                        <input type="hidden" id="tiendaSateliteId">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Nombre *</label>
+                                    <input type="text" class="form-control" id="tiendaSateliteNombre" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Ciudad *</label>
+                                    <input type="text" class="form-control" id="tiendaSateliteCiudad" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Dirección *</label>
+                                    <input type="text" class="form-control" id="tiendaSateliteDireccion" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Tipo Satélite</label>
+                                    <input type="text" class="form-control" id="tiendaSateliteTipo">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Estado *</label>
+                                    <select class="form-control" id="tiendaSateliteEstado" required>
+                                        <option value="activo">Activo</option>
+                                        <option value="planeado">Planeado</option>
+                                        <option value="proxima_apertura">Próxima Apertura</option>
+                                        <option value="en_construccion">En Construcción</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Fecha de Apertura *</label>
+                                    <input type="date" class="form-control" id="tiendaSateliteFechaApertura" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Coordenadas (Lat, Lon) *</label>
+                                    <input type="text" class="form-control" id="tiendaSateliteCoordenadas" 
+                                           placeholder="9.975297813537146, -84.12769671986695" required>
+                                    <div class="form-text">
+                                        <i class="fas fa-info-circle"></i> Copia y pega las coordenadas desde Google Maps
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="guardarTiendaSatelite()">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/static/js/mantenimiento.js"></script>

@@ -5,6 +5,7 @@
         "direccion": "SAN RAFAEL DE HEREDIA",
         "telefono": "2234-5678",
         "estado": "activo",
+        "fecha_apertura": "2025-11-27",
         "lat": 10.01310191,
         "lon": -84.09848401,
         "id": "2"
@@ -136,20 +137,6 @@
         "zona_cobertura": "Cartago Centro"
     },
     {
-        "id": "31",
-        "nombre": "SEDI CARNES SAN MARTIN",
-        "ciudad": "HEREDIA",
-        "lat": 9.9838677,
-        "lon": -84.1400845,
-        "direccion": "HEREDIA",
-        "telefono": "2260-7788",
-        "estado": "activo",
-        "fecha_apertura": "2024-01-01",
-        "fecha_cierre": null,
-        "responsable": "Gerente Regional",
-        "zona_cobertura": "Todo el País"
-    },
-    {
         "id": "32",
         "nombre": "CARNES SAN MARTIN CARTAGO TARAS",
         "ciudad": "CARTAGO",
@@ -164,25 +151,12 @@
         "zona_cobertura": "Cartago Este"
     },
     {
-        "id": "33",
-        "nombre": "CENTRO DISTRIBUCION CARNES SAN MARTIN",
-        "ciudad": "HEREDIA",
-        "lat": 9.9838432,
-        "lon": -84.1400806,
-        "direccion": "BARREAL DE HEREDIA",
-        "telefono": "2260-9900",
-        "estado": "activo",
-        "fecha_apertura": "2024-01-01",
-        "fecha_cierre": null,
-        "responsable": "Director Logística",
-        "zona_cobertura": "Distribución Nacional"
-    },
-    {
         "nombre": "CARNES SAN MARTIN SANTA ANA",
         "ciudad": "SANTA ANA",
         "direccion": "SANTA ANA",
         "telefono": "2282-0011",
         "estado": "activo",
+        "fecha_apertura": "2025-11-27",
         "lat": 9.93515742,
         "lon": -84.18849632,
         "id": "34"
@@ -192,59 +166,10 @@
         "ciudad": "PUNTARENAS",
         "direccion": "JACO",
         "telefono": "2282-0011",
-        "estado": "planeado",
+        "estado": "proxima_apertura",
+        "fecha_apertura": "2026-02-01",
         "lat": 9.614588,
         "lon": -84.626152,
         "id": "42"
-    },
-    {
-        "nombre": "CARNES SAN MARTIN LIBERIA SOLARIUM",
-        "ciudad": "GUANACASTE",
-        "direccion": "Solarium, Guanacaste  Liberia",
-        "telefono": "26681360",
-        "estado": "activo",
-        "lat": 10.592966318791047,
-        "lon": -85.53532584614214,
-        "id": "D016"
-    },
-    {
-        "nombre": "CARNES SAN MARTIN NICOYA",
-        "ciudad": "GUANACASTE",
-        "direccion": "CENTRO COMERCIAL PLAZA AMARA",
-        "telefono": "88400480",
-        "estado": "activo",
-        "lat": 10.159306911873077,
-        "lon": -85.44720688043704,
-        "id": "D017"
-    },
-    {
-        "nombre": "CARNES SAN MARTIN PLAYA EL COCO",
-        "ciudad": "GUANACASTE",
-        "direccion": "Playas del Coco, La Chorrera Pueblito Sur, Guanacaste, Carrillo",
-        "telefono": "60284948",
-        "estado": "activo",
-        "lat": 10.553822942833285,
-        "lon": -85.6925297359551,
-        "id": "D018"
-    },
-    {
-        "nombre": "CARNES SAN MARTIN HUACAS",
-        "ciudad": "GUANACASTE",
-        "direccion": "FRENTE A PLAZA PASEO DEL MAR",
-        "telefono": "6048-4948",
-        "estado": "activo",
-        "lat": 10.3779267749508,
-        "lon": -85.7857224726091,
-        "id": "D019"
-    },
-    {
-        "nombre": "CARNES SAN MARTIN HEREDIA SAN FRANCISCO",
-        "ciudad": "HEREDIA",
-        "direccion": "PLAZA NAJORI, SAN FRANCISCO DE HEREDIA, LOCAL #4",
-        "telefono": "4035-6581",
-        "estado": "activo",
-        "lat": 9.998073932427092,
-        "lon": -84.14361316353484,
-        "id": "D020"
     }
 ]

@@ -1,47 +1,275 @@
 // Navegación entre secciones
 document.addEventListener('DOMContentLoaded', function() {
-    // Navegación del sidebar
-    document.querySelectorAll('.nav-link').forEach(link => {
+    // Cargar solo los datos de la sección activa inicial (Centros de Distribución)
+    cargarCentrosDistribucion();
+
+    // Configurar navegación
+    const navLinks = document.querySelectorAll('.nav-link[data-target]');
+    navLinks.forEach(link => {
         link.addEventListener('click', function(e) {
-            if (this.getAttribute('data-target')) {
-                e.preventDefault();
-                
-                // Remover active de todos los links
-                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-                // Agregar active al link clickeado
-                this.classList.add('active');
-                
-                // Ocultar todas las secciones
-                document.querySelectorAll('.content-section').forEach(section => {
-                    section.classList.remove('active');
-                });
-                
-                // Mostrar sección correspondiente
-                const target = this.getAttribute('data-target');
-                document.getElementById(target).classList.add('active');
-                
-                // Cargar datos si es necesario
-                if (target === 'distribuidores') cargarDistribuidores();
-                else if (target === 'tiendas-oro') cargarTiendasOro();
-                else if (target === 'tiendas-satelite') cargarTiendasSatelite();
-            }
+            e.preventDefault();
+            
+            // Remover active de todos
+            navLinks.forEach(nl => nl.classList.remove('active'));
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Activar actual
+            this.classList.add('active');
+            const target = this.getAttribute('data-target');
+            document.getElementById(target).classList.add('active');
+            
+            // Cargar datos de la sección activa
+            cargarSeccionActiva();
         });
     });
-
-    // Cargar datos iniciales
-    cargarDistribuidores();
 });
 
+function cargarSeccionActiva() {
+    const seccionActiva = document.querySelector('.content-section.active');
+    if (!seccionActiva) return;
+    
+    const seccionId = seccionActiva.id;
+    console.log('Cargando sección:', seccionId);
+    
+    switch(seccionId) {
+        case 'centros-distribucion':
+            cargarCentrosDistribucion();
+            break;
+        case 'distribuidores':
+            cargarDistribuidores();
+            break;
+        case 'tiendas-oro':
+            cargarTiendasOro();
+            break;
+        case 'tiendas-satelite':
+            cargarTiendasSatelite();
+            break;
+    }
+}
 // ============================================================================
-// FUNCIONES PARA DISTRIBUIDORES (ACTUALIZADAS)
+// FUNCIONES PARA CENTROS DE DISTRIBUCIÓN
+// ============================================================================
+
+function cargarCentrosDistribucion() {
+    console.log('Cargando centros de distribución...');
+    fetch('/api/centros-distribucion')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error en la respuesta de la API');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Datos de centros recibidos:', data);
+            const tbody = document.getElementById('tbodyCentrosDistribucion');
+            if (!tbody) {
+                console.error('No se encontró tbodyCentrosDistribucion');
+                return;
+            }
+            
+            tbody.innerHTML = '';
+            
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" class="text-center">No hay centros de distribución registrados</td></tr>';
+                return;
+            }
+            
+            data.forEach(centro => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${centro.id}</td>
+                    <td>${centro.nombre}</td>
+                    <td>${centro.ciudad}</td>
+                    <td>${centro.direccion}</td>
+                    <td><span class="estado-${centro.estado}">${formatearEstado(centro.estado)}</span></td>
+                    <td>${centro.telefono || 'N/A'}</td>
+                    <td>${centro.capacidad_almacen || 'N/A'}</td>
+                    <td>${centro.tipo_centro || 'N/A'}</td>
+                    <td>${formatearFecha(centro.fecha_apertura)}</td>
+                    <td class="table-actions">
+                        <button class="btn btn-sm btn-warning me-1" onclick="editarCentroDistribucion('${centro.id}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="eliminarCentroDistribucion('${centro.id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        })
+        .catch(error => {
+            console.error('Error cargando centros de distribución:', error);
+            const tbody = document.getElementById('tbodyCentrosDistribucion');
+            if (tbody) {
+                tbody.innerHTML = '<tr><td colspan="10" class="text-center text-danger">Error al cargar los datos</td></tr>';
+            }
+        });
+}
+
+function abrirModalCentroDistribucion(centro = null) {
+    const modal = new bootstrap.Modal(document.getElementById('modalCentroDistribucion'));
+    const form = document.getElementById('formCentroDistribucion');
+    form.reset();
+    
+    if (centro) {
+        document.getElementById('modalCentroDistribucionTitle').textContent = 'Editar Centro de Distribución';
+        document.getElementById('centroDistribucionId').value = centro.id;
+        document.getElementById('centroDistribucionNombre').value = centro.nombre;
+        document.getElementById('centroDistribucionCiudad').value = centro.ciudad;
+        document.getElementById('centroDistribucionDireccion').value = centro.direccion;
+        document.getElementById('centroDistribucionTelefono').value = centro.telefono || '';
+        document.getElementById('centroDistribucionCapacidad').value = centro.capacidad_almacen || '';
+        document.getElementById('centroDistribucionTipo').value = centro.tipo_centro || 'Principal';
+        document.getElementById('centroDistribucionEstado').value = centro.estado;
+        document.getElementById('centroDistribucionFechaApertura').value = centro.fecha_apertura || '';
+        document.getElementById('centroDistribucionZonaCobertura').value = centro.zona_cobertura || '';
+        document.getElementById('centroDistribucionResponsable').value = centro.responsable || '';
+        document.getElementById('centroDistribucionCoordenadas').value = `${centro.lat}, ${centro.lon}`;
+    } else {
+        document.getElementById('modalCentroDistribucionTitle').textContent = 'Nuevo Centro de Distribución';
+        document.getElementById('centroDistribucionId').value = '';
+        document.getElementById('centroDistribucionFechaApertura').value = new Date().toISOString().split('T')[0];
+        document.getElementById('centroDistribucionCoordenadas').value = '';
+    }
+    
+    modal.show();
+}
+
+function guardarCentroDistribucion() {
+    const form = document.getElementById('formCentroDistribucion');
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+
+    // Procesar coordenadas
+    const coordenadas = document.getElementById('centroDistribucionCoordenadas').value.split(',');
+    if (coordenadas.length !== 2) {
+        alert('Formato de coordenadas inválido. Use: latitud, longitud');
+        return;
+    }
+
+    const lat = parseFloat(coordenadas[0].trim());
+    const lon = parseFloat(coordenadas[1].trim());
+    
+    if (isNaN(lat) || isNaN(lon)) {
+        alert('Coordenadas inválidas. Asegúrese de usar números.');
+        return;
+    }
+
+    const centroData = {
+        nombre: document.getElementById('centroDistribucionNombre').value,
+        ciudad: document.getElementById('centroDistribucionCiudad').value,
+        direccion: document.getElementById('centroDistribucionDireccion').value,
+        telefono: document.getElementById('centroDistribucionTelefono').value,
+        capacidad_almacen: document.getElementById('centroDistribucionCapacidad').value,
+        tipo_centro: document.getElementById('centroDistribucionTipo').value,
+        estado: document.getElementById('centroDistribucionEstado').value,
+        fecha_apertura: document.getElementById('centroDistribucionFechaApertura').value,
+        zona_cobertura: document.getElementById('centroDistribucionZonaCobertura').value,
+        responsable: document.getElementById('centroDistribucionResponsable').value,
+        lat: lat,
+        lon: lon
+    };
+
+    const centroId = document.getElementById('centroDistribucionId').value;
+    const url = centroId ? `/api/centros-distribucion/${centroId}` : '/api/centros-distribucion';
+    const method = centroId ? 'PUT' : 'POST';
+
+    fetch(url, {
+        method: method,
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(centroData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            bootstrap.Modal.getInstance(document.getElementById('modalCentroDistribucion')).hide();
+            cargarCentrosDistribucion();
+            mostrarAlerta('Centro de Distribución guardado exitosamente', 'success');
+        } else {
+            throw new Error(data.error || 'Error al guardar');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        mostrarAlerta('Error al guardar centro de distribución: ' + error.message, 'danger');
+    });
+}
+
+function editarCentroDistribucion(id) {
+    fetch(`/api/centros-distribucion`)
+        .then(response => response.json())
+        .then(centros => {
+            const centro = centros.find(c => c.id === id);
+            if (centro) {
+                abrirModalCentroDistribucion(centro);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+function eliminarCentroDistribucion(id) {
+    if (confirm('¿Está seguro de que desea eliminar este centro de distribución?')) {
+        fetch(`/api/centros-distribucion/${id}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                cargarCentrosDistribucion();
+                mostrarAlerta('Centro de Distribución eliminado exitosamente', 'success');
+            } else {
+                throw new Error(data.error || 'Error al eliminar');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            mostrarAlerta('Error al eliminar centro de distribución: ' + error.message, 'danger');
+        });
+    }
+}
+
+// ============================================================================
+// FUNCIONES PARA DISTRIBUIDORES
 // ============================================================================
 
 function cargarDistribuidores() {
+    console.log('📦 Cargando distribuidores...');
     fetch('/api/distribuidores')
-        .then(response => response.json())
+        .then(response => {
+            console.log('📡 Respuesta de API distribuidores:', response.status, response.statusText);
+            
+            if (!response.ok) {
+                if (response.status === 401) {
+                    throw new Error('No autorizado - Sesión expirada');
+                } else if (response.status === 404) {
+                    throw new Error('API no encontrada');
+                } else {
+                    throw new Error(`Error HTTP: ${response.status} ${response.statusText}`);
+                }
+            }
+            return response.json();
+        })
         .then(data => {
+            console.log('✅ Datos de distribuidores recibidos:', data);
             const tbody = document.getElementById('tbodyDistribuidores');
+            if (!tbody) {
+                console.error('❌ No se encontró tbodyDistribuidores');
+                return;
+            }
+            
             tbody.innerHTML = '';
+            
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="text-center">No hay distribuidores registrados</td></tr>';
+                return;
+            }
             
             data.forEach(distribuidor => {
                 const tr = document.createElement('tr');
@@ -52,6 +280,7 @@ function cargarDistribuidores() {
                     <td>${distribuidor.direccion}</td>
                     <td><span class="estado-${distribuidor.estado}">${formatearEstado(distribuidor.estado)}</span></td>
                     <td>${distribuidor.telefono || 'N/A'}</td>
+                    <td>${formatearFecha(distribuidor.fecha_apertura)}</td>
                     <td class="table-actions">
                         <button class="btn btn-sm btn-warning me-1" onclick="editarDistribuidor('${distribuidor.id}')">
                             <i class="fas fa-edit"></i>
@@ -64,14 +293,28 @@ function cargarDistribuidores() {
                 tbody.appendChild(tr);
             });
         })
-        .catch(error => console.error('Error cargando distribuidores:', error));
+        .catch(error => {
+            console.error('💥 Error cargando distribuidores:', error);
+            const tbody = document.getElementById('tbodyDistribuidores');
+            if (tbody) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center text-danger">
+                            <strong>Error al cargar los datos</strong><br>
+                            <small>${error.message}</small>
+                        </td>
+                    </tr>
+                `;
+            }
+        });
 }
 
 function abrirModalDistribuidor(distribuidor = null) {
     const modal = new bootstrap.Modal(document.getElementById('modalDistribuidor'));
+    const form = document.getElementById('formDistribuidor');
+    form.reset();
     
     if (distribuidor) {
-        // Modo edición
         document.getElementById('modalDistribuidorTitle').textContent = 'Editar Distribuidor';
         document.getElementById('distribuidorId').value = distribuidor.id;
         document.getElementById('distribuidorNombre').value = distribuidor.nombre;
@@ -79,74 +322,61 @@ function abrirModalDistribuidor(distribuidor = null) {
         document.getElementById('distribuidorDireccion').value = distribuidor.direccion;
         document.getElementById('distribuidorTelefono').value = distribuidor.telefono || '';
         document.getElementById('distribuidorEstado').value = distribuidor.estado;
-        // COORDENADAS EN UNA LÍNEA
+        document.getElementById('distribuidorFechaApertura').value = distribuidor.fecha_apertura || '';
         document.getElementById('distribuidorCoordenadas').value = `${distribuidor.lat}, ${distribuidor.lon}`;
     } else {
-        // Modo nuevo
         document.getElementById('modalDistribuidorTitle').textContent = 'Nuevo Distribuidor';
-        document.getElementById('formDistribuidor').reset();
         document.getElementById('distribuidorId').value = '';
+        document.getElementById('distribuidorFechaApertura').value = new Date().toISOString().split('T')[0];
+        document.getElementById('distribuidorCoordenadas').value = '';
     }
     
     modal.show();
 }
 
-function editarDistribuidor(id) {
-    fetch('/api/distribuidores')
-        .then(response => response.json())
-        .then(distribuidores => {
-            const distribuidor = distribuidores.find(d => d.id === id);
-            if (distribuidor) {
-                abrirModalDistribuidor(distribuidor);
-            }
-        });
-}
-
 function guardarDistribuidor() {
+    const form = document.getElementById('formDistribuidor');
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+
     // Procesar coordenadas
-    const coordenadasInput = document.getElementById('distribuidorCoordenadas').value;
-    const coordenadas = coordenadasInput.split(',');
-    
+    const coordenadas = document.getElementById('distribuidorCoordenadas').value.split(',');
     if (coordenadas.length !== 2) {
-        mostrarAlerta('Formato de coordenadas inválido. Use: latitud, longitud', 'danger');
+        alert('Formato de coordenadas inválido. Use: latitud, longitud');
         return;
     }
 
     const lat = parseFloat(coordenadas[0].trim());
     const lon = parseFloat(coordenadas[1].trim());
-
+    
     if (isNaN(lat) || isNaN(lon)) {
-        mostrarAlerta('Las coordenadas deben ser números válidos', 'danger');
+        alert('Coordenadas inválidas. Asegúrese de usar números.');
         return;
     }
 
-    const id = document.getElementById('distribuidorId').value;
-    
-    // Construir formData incluyendo el ID cuando esté en modo edición
-    const formData = {
+    const distribuidorData = {
         nombre: document.getElementById('distribuidorNombre').value,
         ciudad: document.getElementById('distribuidorCiudad').value,
         direccion: document.getElementById('distribuidorDireccion').value,
         telefono: document.getElementById('distribuidorTelefono').value,
         estado: document.getElementById('distribuidorEstado').value,
+        fecha_apertura: document.getElementById('distribuidorFechaApertura').value,
         lat: lat,
         lon: lon
     };
 
-    // INCLUIR EL ID EN LOS DATOS CUANDO SEA EDICIÓN
-    if (id) {
-        formData.id = id;
-    }
-
-    const url = id ? `/api/distribuidores/${id}` : '/api/distribuidores';
-    const method = id ? 'PUT' : 'POST';
+    const distribuidorId = document.getElementById('distribuidorId').value;
+    const url = distribuidorId ? `/api/distribuidores/${distribuidorId}` : '/api/distribuidores';
+    const method = distribuidorId ? 'PUT' : 'POST';
 
     fetch(url, {
         method: method,
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(distribuidorData)
     })
     .then(response => response.json())
     .then(data => {
@@ -155,38 +385,17 @@ function guardarDistribuidor() {
             cargarDistribuidores();
             mostrarAlerta('Distribuidor guardado exitosamente', 'success');
         } else {
-            mostrarAlerta('Error al guardar: ' + data.error, 'danger');
+            throw new Error(data.error || 'Error al guardar');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        mostrarAlerta('Error al guardar', 'danger');
+        mostrarAlerta('Error al guardar distribuidor: ' + error.message, 'danger');
     });
 }
 
-function eliminarDistribuidor(id) {
-    if (confirm('¿Estás seguro de que quieres eliminar este distribuidor?')) {
-        fetch(`/api/distribuidores/${id}`, {
-            method: 'DELETE'
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                cargarDistribuidores();
-                mostrarAlerta('Distribuidor eliminado exitosamente', 'success');
-            } else {
-                mostrarAlerta('Error al eliminar: ' + data.error, 'danger');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            mostrarAlerta('Error al eliminar', 'danger');
-        });
-    }
-}
-
 // ============================================================================
-// FUNCIONES PARA TIENDAS ORO (ACTUALIZADAS)
+// FUNCIONES PARA TIENDAS ORO
 // ============================================================================
 
 function cargarTiendasOro() {
@@ -205,6 +414,7 @@ function cargarTiendasOro() {
                     <td>${tienda.direccion}</td>
                     <td><span class="estado-${tienda.estado}">${formatearEstado(tienda.estado)}</span></td>
                     <td>${tienda.capacidad_congelador || 'N/A'}</td>
+                    <td>${formatearFecha(tienda.fecha_apertura)}</td>
                     <td class="table-actions">
                         <button class="btn btn-sm btn-warning me-1" onclick="editarTiendaOro('${tienda.id}')">
                             <i class="fas fa-edit"></i>
@@ -216,11 +426,14 @@ function cargarTiendasOro() {
                 `;
                 tbody.appendChild(tr);
             });
-        });
+        })
+        .catch(error => console.error('Error cargando tiendas oro:', error));
 }
 
 function abrirModalTiendaOro(tienda = null) {
     const modal = new bootstrap.Modal(document.getElementById('modalTiendaOro'));
+    const form = document.getElementById('formTiendaOro');
+    form.reset();
     
     if (tienda) {
         document.getElementById('modalTiendaOroTitle').textContent = 'Editar Tienda Oro';
@@ -230,68 +443,61 @@ function abrirModalTiendaOro(tienda = null) {
         document.getElementById('tiendaOroDireccion').value = tienda.direccion;
         document.getElementById('tiendaOroCapacidad').value = tienda.capacidad_congelador || '';
         document.getElementById('tiendaOroEstado').value = tienda.estado;
-        // COORDENADAS EN UNA LÍNEA
+        document.getElementById('tiendaOroFechaApertura').value = tienda.fecha_apertura || '';
         document.getElementById('tiendaOroCoordenadas').value = `${tienda.lat}, ${tienda.lon}`;
     } else {
         document.getElementById('modalTiendaOroTitle').textContent = 'Nueva Tienda Oro';
-        document.getElementById('formTiendaOro').reset();
         document.getElementById('tiendaOroId').value = '';
+        document.getElementById('tiendaOroFechaApertura').value = new Date().toISOString().split('T')[0];
+        document.getElementById('tiendaOroCoordenadas').value = '';
     }
     
     modal.show();
 }
 
-function editarTiendaOro(id) {
-    fetch('/api/tiendas-oro')
-        .then(response => response.json())
-        .then(tiendas => {
-            const tienda = tiendas.find(t => t.id === id);
-            if (tienda) abrirModalTiendaOro(tienda);
-        });
-}
-
 function guardarTiendaOro() {
+    const form = document.getElementById('formTiendaOro');
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+
     // Procesar coordenadas
-    const coordenadasInput = document.getElementById('tiendaOroCoordenadas').value;
-    const coordenadas = coordenadasInput.split(',');
-    
+    const coordenadas = document.getElementById('tiendaOroCoordenadas').value.split(',');
     if (coordenadas.length !== 2) {
-        mostrarAlerta('Formato de coordenadas inválido. Use: latitud, longitud', 'danger');
+        alert('Formato de coordenadas inválido. Use: latitud, longitud');
         return;
     }
 
     const lat = parseFloat(coordenadas[0].trim());
     const lon = parseFloat(coordenadas[1].trim());
-
+    
     if (isNaN(lat) || isNaN(lon)) {
-        mostrarAlerta('Las coordenadas deben ser números válidos', 'danger');
+        alert('Coordenadas inválidas. Asegúrese de usar números.');
         return;
     }
 
-    const id = document.getElementById('tiendaOroId').value;
-    
-    const formData = {
+    const tiendaData = {
         nombre: document.getElementById('tiendaOroNombre').value,
         ciudad: document.getElementById('tiendaOroCiudad').value,
         direccion: document.getElementById('tiendaOroDireccion').value,
         capacidad_congelador: document.getElementById('tiendaOroCapacidad').value,
         estado: document.getElementById('tiendaOroEstado').value,
+        fecha_apertura: document.getElementById('tiendaOroFechaApertura').value,
         lat: lat,
         lon: lon
     };
 
-    // INCLUIR EL ID EN LOS DATOS CUANDO SEA EDICIÓN
-    if (id) {
-        formData.id = id;
-    }
-
-    const url = id ? `/api/tiendas-oro/${id}` : '/api/tiendas-oro';
-    const method = id ? 'PUT' : 'POST';
+    const tiendaId = document.getElementById('tiendaOroId').value;
+    const url = tiendaId ? `/api/tiendas-oro/${tiendaId}` : '/api/tiendas-oro';
+    const method = tiendaId ? 'PUT' : 'POST';
 
     fetch(url, {
         method: method,
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(formData)
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(tiendaData)
     })
     .then(response => response.json())
     .then(data => {
@@ -300,28 +506,17 @@ function guardarTiendaOro() {
             cargarTiendasOro();
             mostrarAlerta('Tienda Oro guardada exitosamente', 'success');
         } else {
-            mostrarAlerta('Error al guardar: ' + data.error, 'danger');
+            throw new Error(data.error || 'Error al guardar');
         }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        mostrarAlerta('Error al guardar tienda oro: ' + error.message, 'danger');
     });
 }
 
-function eliminarTiendaOro(id) {
-    if (confirm('¿Estás seguro de que quieres eliminar esta tienda oro?')) {
-        fetch(`/api/tiendas-oro/${id}`, {method: 'DELETE'})
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                cargarTiendasOro();
-                mostrarAlerta('Tienda Oro eliminada exitosamente', 'success');
-            } else {
-                mostrarAlerta('Error al eliminar: ' + data.error, 'danger');
-            }
-        });
-    }
-}
-
 // ============================================================================
-// FUNCIONES PARA TIENDAS SATÉLITE (ACTUALIZADAS)
+// FUNCIONES PARA TIENDAS SATÉLITE
 // ============================================================================
 
 function cargarTiendasSatelite() {
@@ -340,6 +535,7 @@ function cargarTiendasSatelite() {
                     <td>${tienda.direccion}</td>
                     <td><span class="estado-${tienda.estado}">${formatearEstado(tienda.estado)}</span></td>
                     <td>${tienda.tipo_satelite || 'N/A'}</td>
+                    <td>${formatearFecha(tienda.fecha_apertura)}</td>
                     <td class="table-actions">
                         <button class="btn btn-sm btn-warning me-1" onclick="editarTiendaSatelite('${tienda.id}')">
                             <i class="fas fa-edit"></i>
@@ -351,11 +547,14 @@ function cargarTiendasSatelite() {
                 `;
                 tbody.appendChild(tr);
             });
-        });
+        })
+        .catch(error => console.error('Error cargando tiendas satélite:', error));
 }
 
 function abrirModalTiendaSatelite(tienda = null) {
     const modal = new bootstrap.Modal(document.getElementById('modalTiendaSatelite'));
+    const form = document.getElementById('formTiendaSatelite');
+    form.reset();
     
     if (tienda) {
         document.getElementById('modalTiendaSateliteTitle').textContent = 'Editar Tienda Satélite';
@@ -365,68 +564,61 @@ function abrirModalTiendaSatelite(tienda = null) {
         document.getElementById('tiendaSateliteDireccion').value = tienda.direccion;
         document.getElementById('tiendaSateliteTipo').value = tienda.tipo_satelite || '';
         document.getElementById('tiendaSateliteEstado').value = tienda.estado;
-        // COORDENADAS EN UNA LÍNEA
+        document.getElementById('tiendaSateliteFechaApertura').value = tienda.fecha_apertura || '';
         document.getElementById('tiendaSateliteCoordenadas').value = `${tienda.lat}, ${tienda.lon}`;
     } else {
         document.getElementById('modalTiendaSateliteTitle').textContent = 'Nueva Tienda Satélite';
-        document.getElementById('formTiendaSatelite').reset();
         document.getElementById('tiendaSateliteId').value = '';
+        document.getElementById('tiendaSateliteFechaApertura').value = new Date().toISOString().split('T')[0];
+        document.getElementById('tiendaSateliteCoordenadas').value = '';
     }
     
     modal.show();
 }
 
-function editarTiendaSatelite(id) {
-    fetch('/api/tiendas-satelite')
-        .then(response => response.json())
-        .then(tiendas => {
-            const tienda = tiendas.find(t => t.id === id);
-            if (tienda) abrirModalTiendaSatelite(tienda);
-        });
-}
-
 function guardarTiendaSatelite() {
+    const form = document.getElementById('formTiendaSatelite');
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+
     // Procesar coordenadas
-    const coordenadasInput = document.getElementById('tiendaSateliteCoordenadas').value;
-    const coordenadas = coordenadasInput.split(',');
-    
+    const coordenadas = document.getElementById('tiendaSateliteCoordenadas').value.split(',');
     if (coordenadas.length !== 2) {
-        mostrarAlerta('Formato de coordenadas inválido. Use: latitud, longitud', 'danger');
+        alert('Formato de coordenadas inválido. Use: latitud, longitud');
         return;
     }
 
     const lat = parseFloat(coordenadas[0].trim());
     const lon = parseFloat(coordenadas[1].trim());
-
+    
     if (isNaN(lat) || isNaN(lon)) {
-        mostrarAlerta('Las coordenadas deben ser números válidos', 'danger');
+        alert('Coordenadas inválidas. Asegúrese de usar números.');
         return;
     }
 
-    const id = document.getElementById('tiendaSateliteId').value;
-    
-    const formData = {
+    const tiendaData = {
         nombre: document.getElementById('tiendaSateliteNombre').value,
         ciudad: document.getElementById('tiendaSateliteCiudad').value,
         direccion: document.getElementById('tiendaSateliteDireccion').value,
         tipo_satelite: document.getElementById('tiendaSateliteTipo').value,
         estado: document.getElementById('tiendaSateliteEstado').value,
+        fecha_apertura: document.getElementById('tiendaSateliteFechaApertura').value,
         lat: lat,
         lon: lon
     };
 
-    // INCLUIR EL ID EN LOS DATOS CUANDO SEA EDICIÓN
-    if (id) {
-        formData.id = id;
-    }
-
-    const url = id ? `/api/tiendas-satelite/${id}` : '/api/tiendas-satelite';
-    const method = id ? 'PUT' : 'POST';
+    const tiendaId = document.getElementById('tiendaSateliteId').value;
+    const url = tiendaId ? `/api/tiendas-satelite/${tiendaId}` : '/api/tiendas-satelite';
+    const method = tiendaId ? 'PUT' : 'POST';
 
     fetch(url, {
         method: method,
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(formData)
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(tiendaData)
     })
     .then(response => response.json())
     .then(data => {
@@ -435,23 +627,13 @@ function guardarTiendaSatelite() {
             cargarTiendasSatelite();
             mostrarAlerta('Tienda Satélite guardada exitosamente', 'success');
         } else {
-            mostrarAlerta('Error al guardar: ' + data.error, 'danger');
+            throw new Error(data.error || 'Error al guardar');
         }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        mostrarAlerta('Error al guardar tienda satélite: ' + error.message, 'danger');
     });
-}
-function eliminarTiendaSatelite(id) {
-    if (confirm('¿Estás seguro de que quieres eliminar esta tienda satélite?')) {
-        fetch(`/api/tiendas-satelite/${id}`, {method: 'DELETE'})
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                cargarTiendasSatelite();
-                mostrarAlerta('Tienda Satélite eliminada exitosamente', 'success');
-            } else {
-                mostrarAlerta('Error al eliminar: ' + data.error, 'danger');
-            }
-        });
-    }
 }
 
 // ============================================================================
@@ -468,26 +650,162 @@ function formatearEstado(estado) {
     return estados[estado] || estado;
 }
 
+function formatearFecha(fecha) {
+    if (!fecha) return 'N/A';
+    const date = new Date(fecha);
+    return date.toLocaleDateString('es-ES');
+}
+
 function mostrarAlerta(mensaje, tipo) {
-    // Crear alerta temporal
     const alerta = document.createElement('div');
-    alerta.className = `alert alert-${tipo} alert-dismissible fade show`;
+    alerta.className = `alert alert-${tipo} alert-dismissible fade show position-fixed`;
+    alerta.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
     alerta.innerHTML = `
         ${mensaje}
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     `;
-    alerta.style.position = 'fixed';
-    alerta.style.top = '20px';
-    alerta.style.right = '20px';
-    alerta.style.zIndex = '9999';
-    alerta.style.minWidth = '300px';
     
     document.body.appendChild(alerta);
     
-    // Auto-eliminar después de 5 segundos
     setTimeout(() => {
         if (alerta.parentNode) {
             alerta.parentNode.removeChild(alerta);
         }
     }, 5000);
+}
+
+// ============================================================================
+// FUNCIONES DE EDICIÓN Y ELIMINACIÓN
+// ============================================================================
+
+function editarCentroDistribucion(id) {
+    fetch(`/api/centros-distribucion`)
+        .then(response => response.json())
+        .then(centros => {
+            const centro = centros.find(c => c.id === id);
+            if (centro) {
+                abrirModalCentroDistribucion(centro);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+function eliminarCentroDistribucion(id) {
+    if (confirm('¿Está seguro de que desea eliminar este centro de distribución?')) {
+        fetch(`/api/centros-distribucion/${id}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                cargarCentrosDistribucion();
+                mostrarAlerta('Centro de Distribución eliminado exitosamente', 'success');
+            } else {
+                throw new Error(data.error || 'Error al eliminar');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            mostrarAlerta('Error al eliminar centro de distribución: ' + error.message, 'danger');
+        });
+    }
+}
+
+function editarDistribuidor(id) {
+    fetch(`/api/distribuidores`)
+        .then(response => response.json())
+        .then(distribuidores => {
+            const distribuidor = distribuidores.find(d => d.id === id);
+            if (distribuidor) {
+                abrirModalDistribuidor(distribuidor);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+function eliminarDistribuidor(id) {
+    if (confirm('¿Está seguro de que desea eliminar este distribuidor?')) {
+        fetch(`/api/distribuidores/${id}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                cargarDistribuidores();
+                mostrarAlerta('Distribuidor eliminado exitosamente', 'success');
+            } else {
+                throw new Error(data.error || 'Error al eliminar');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            mostrarAlerta('Error al eliminar distribuidor: ' + error.message, 'danger');
+        });
+    }
+}
+
+function editarTiendaOro(id) {
+    fetch(`/api/tiendas-oro`)
+        .then(response => response.json())
+        .then(tiendas => {
+            const tienda = tiendas.find(t => t.id === id);
+            if (tienda) {
+                abrirModalTiendaOro(tienda);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+function eliminarTiendaOro(id) {
+    if (confirm('¿Está seguro de que desea eliminar esta tienda oro?')) {
+        fetch(`/api/tiendas-oro/${id}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                cargarTiendasOro();
+                mostrarAlerta('Tienda Oro eliminada exitosamente', 'success');
+            } else {
+                throw new Error(data.error || 'Error al eliminar');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            mostrarAlerta('Error al eliminar tienda oro: ' + error.message, 'danger');
+        });
+    }
+}
+
+function editarTiendaSatelite(id) {
+    fetch(`/api/tiendas-satelite`)
+        .then(response => response.json())
+        .then(tiendas => {
+            const tienda = tiendas.find(t => t.id === id);
+            if (tienda) {
+                abrirModalTiendaSatelite(tienda);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+function eliminarTiendaSatelite(id) {
+    if (confirm('¿Está seguro de que desea eliminar esta tienda satélite?')) {
+        fetch(`/api/tiendas-satelite/${id}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                cargarTiendasSatelite();
+                mostrarAlerta('Tienda Satélite eliminada exitosamente', 'success');
+            } else {
+                throw new Error(data.error || 'Error al eliminar');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            mostrarAlerta('Error al eliminar tienda satélite: ' + error.message, 'danger');
+        });
+    }
 }

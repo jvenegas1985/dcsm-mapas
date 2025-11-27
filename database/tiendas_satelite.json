@@ -5,8 +5,20 @@
         "direccion": "PUNTARENAS",
         "tipo_satelite": "TIENDA SATELITE",
         "estado": "activo",
+        "fecha_apertura": "2025-06-18",
         "lat": 9.609430705942222,
         "lon": -84.10046028721031,
         "id": "TS001"
+    },
+    {
+        "nombre": "TIENDA EJEMPLO 3",
+        "ciudad": "ad",
+        "direccion": "ad",
+        "tipo_satelite": "TIENDA SATELITE",
+        "estado": "proxima_apertura",
+        "fecha_apertura": "2026-06-01",
+        "lat": 9.920666354944164,
+        "lon": -84.02033070907565,
+        "id": "TS002"
     }
 ]

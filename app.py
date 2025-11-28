@@ -31,8 +31,7 @@ def inicializar_datos_si_no_existen():
             guardar_datos_en_json(archivo, [])
             print(f"✅ Archivo inicializado: {archivo}")
 
-# Llamar esta función al inicio del app
-inicializar_datos_si_no_existen()
+
 
 
 # ============================================================================
@@ -1504,6 +1503,7 @@ if __name__ == '__main__':
     # Crear directorios si no existen
     os.makedirs(DATABASE_PATH, exist_ok=True)
     os.makedirs('static/images', exist_ok=True)
+    inicializar_datos_si_no_existen()
     
     print("📍 Verificando estructura de archivos...")
     print(f"📁 Directorio base: {BASE_DIR}")

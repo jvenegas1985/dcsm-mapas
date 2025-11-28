@@ -71,40 +71,40 @@
             color: #6c757d;
         }
 
-        /* 🔥 SELECTOR DE CAPAS EXTRA GRANDE Y VISIBLE */
+        /* 🔥 SELECTOR DE CAPAS COMPACTO */
         .leaflet-control-layers {
-            font-size: 18px !important; /* Más grande */
-            border: 3px solid #2c3e50 !important; /* Borde más visible */
-            border-radius: 10px !important;
+            font-size: 12px !important;
+            border: 1px solid #ccc !important;
+            border-radius: 4px !important;
             background: white !important;
-            padding: 25px !important; /* Más padding */
-            min-width: 320px !important; /* Más ancho */
-            box-shadow: 0 6px 20px rgba(0,0,0,0.2) !important; /* Sombra más pronunciada */
-            margin-top: 120px !important;
-            margin-left: 15px !important;
+            padding: 4px !important;
+            min-width: 140px !important;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.15) !important;
+            margin-top: 10px !important;
+            margin-left: 10px !important;
         }
 
         .leaflet-control-layers-toggle {
-            width: 44px !important; /* Más grande */
-            height: 44px !important;
-            background-size: 28px 28px !important;
+            width: 26px !important;
+            height: 26px !important;
+            background-size: 18px 18px !important;
             background-position: center !important;
         }
 
         .leaflet-control-layers-list {
-            font-size: 16px !important; /* Texto más grande */
-            line-height: 1.6 !important; /* Más espacio entre líneas */
+            font-size: 12px !important;
+            line-height: 1.3 !important;
         }
 
         .leaflet-control-layers label {
-            font-size: 16px !important; /* Texto más grande */
-            margin-bottom: 12px !important; /* Más espacio entre opciones */
-            padding: 8px 0 !important; /* Más padding vertical */
+            font-size: 12px !important;
+            margin-bottom: 4px !important;
+            padding: 2px 0 !important;
             display: flex !important;
             align-items: center !important;
             cursor: pointer !important;
-            border-bottom: 2px solid #f0f0f0 !important; /* Línea más gruesa */
-            font-weight: 500 !important; /* Texto en negrita */
+            border-bottom: 1px solid #f0f0f0 !important;
+            font-weight: normal !important;
         }
 
         .leaflet-control-layers label:last-child {
@@ -112,64 +112,62 @@
         }
 
         .leaflet-control-layers input[type="checkbox"] {
-            width: 26px !important; /* Checkbox más grande */
-            height: 26px !important;
-            margin-right: 50px !important; /* Más espacio del checkbox al texto */
+            width: 12px !important;
+            height: 12px !important;
+            margin-right: 6px !important;
             cursor: pointer !important;
-            transform: scale(1.2); /* Efecto de agrandamiento */
         }
 
         .leaflet-control-layers span {
-            font-weight: 600 !important; /* Texto más negrita */
+            font-weight: normal !important;
             color: #2c3e50 !important;
-            font-size: 16px !important;
+            font-size: 12px !important;
         }
 
         .leaflet-control-layers-expanded {
-            padding: 80px !important; /* Más padding interno */
+            padding: 6px 8px !important;
         }
 
         .leaflet-control-layers-base {
-            margin-bottom: 50px !important; /* Más espacio entre grupos */
+            margin-bottom: 6px !important;
         }
 
         .leaflet-control-layers-overlays {
-            margin-top: px !important; /* Más espacio entre grupos */
+            margin-top: 6px !important;
         }
 
         .leaflet-control-layers-separator {
-            height: 3px !important; /* Separador más grueso */
+            height: 1px !important;
             background: #e9ecef !important;
-            margin: 18px 0 !important; /* Más espacio alrededor del separador */
-            border-radius: 2px !important;
+            margin: 6px 0 !important;
+            border-radius: 1px !important;
         }
 
-        /* Efecto hover más pronunciado */
+        /* Efecto hover sutil */
         .leaflet-control-layers label:hover {
             background-color: #f8f9fa !important;
-            border-radius: 6px !important; /* Bordes más redondeados */
-            padding-left: 12px !important; /* Más padding en hover */
-            margin-left: -12px !important;
-            margin-right: -12px !important;
-            transform: translateX(5px); /* Efecto de movimiento */
+            border-radius: 2px !important;
+            padding-left: 4px !important;
+            margin-left: -4px !important;
+            margin-right: -4px !important;
             transition: all 0.2s ease !important;
         }
 
-        /* Título del selector más destacado */
+        /* Título del selector compacto */
         .leaflet-control-layers h4 {
-            font-size: 18px !important;
-            font-weight: 700 !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
             color: #2c3e50 !important;
-            margin-bottom: 15px !important;
+            margin-bottom: 6px !important;
             text-align: center !important;
-            border-bottom: 2px solid #3498db !important;
-            padding-bottom: 8px !important;
+            border-bottom: 1px solid #3498db !important;
+            padding-bottom: 4px !important;
         }
 
         /* Posición específica para el control en topleft */
         .leaflet-top.leaflet-left {
-            top: 120px !important;
-            left: 15px !important;
+            top: 80px !important;
+            left: 10px !important;
         }
 
         .leaflet-control-container .leaflet-top.leaflet-left {
@@ -184,19 +182,19 @@
             }
             
             .leaflet-control-layers {
-                min-width: 240px !important;
-                padding: 16px !important;
-                margin-top: 100px !important;
-                font-size: 15px !important;
+                min-width: 130px !important;
+                padding: 4px !important;
+                margin-top: 10px !important;
+                font-size: 11px !important;
             }
             
             .leaflet-control-layers label {
-                font-size: 15px !important;
-                margin-bottom: 10px !important;
+                font-size: 11px !important;
+                margin-bottom: 3px !important;
             }
             
             .leaflet-top.leaflet-left {
-                top: 100px !important;
+                top: 70px !important;
             }
         }
 
@@ -213,24 +211,24 @@
             }
             
             .leaflet-control-layers {
-                min-width: 200px !important;
-                font-size: 14px !important;
-                margin-top: 90px !important;
-                padding: 12px !important;
+                min-width: 120px !important;
+                font-size: 10px !important;
+                margin-top: 8px !important;
+                padding: 3px !important;
             }
             
             .leaflet-control-layers label {
-                font-size: 14px !important;
-                margin-bottom: 8px !important;
+                font-size: 10px !important;
+                margin-bottom: 2px !important;
             }
             
             .leaflet-control-layers input[type="checkbox"] {
-                width: 20px !important;
-                height: 20px !important;
+                width: 10px !important;
+                height: 10px !important;
             }
             
             .leaflet-top.leaflet-left {
-                top: 90px !important;
+                top: 60px !important;
             }
         }
     </style>

@@ -1,0 +1,35 @@
+[
+    {
+        "nombre": "ASOC. EMPLEADOS COOPEGUANACASTE",
+        "ciudad": "GUANACASTE",
+        "direccion": "Guanacaste , Santa Cruz, Barrio Tamarindo",
+        "capacidad_congelador": "260L",
+        "estado": "activo",
+        "fecha_apertura": "2025-11-27",
+        "lat": 10.269863826334625,
+        "lon": -85.57310647312687,
+        "id": "TO001"
+    },
+    {
+        "nombre": "FRUTAS Y VERDURAS ALONSO #3",
+        "ciudad": "GUANASCASTE",
+        "direccion": "NOSARA GUANACASTE",
+        "capacidad_congelador": "260L",
+        "estado": "activo",
+        "fecha_apertura": "2025-11-27",
+        "lat": 9.96834629546567,
+        "lon": -85.6477426107406,
+        "id": "TO002"
+    },
+    {
+        "nombre": "SUPER PALA (LUIS ALBERTO PEREZ)",
+        "ciudad": "PUNTARENAS",
+        "direccion": "RECIDENCIAL LOS DELFINES, POCHOTE DE PAQUERA",
+        "capacidad_congelador": "260L",
+        "estado": "proxima_apertura",
+        "fecha_apertura": "2026-07-27",
+        "lat": 9.74361157344752,
+        "lon": -85.01493353943467,
+        "id": "TO003"
+    }
+]

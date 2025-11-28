@@ -14,289 +14,325 @@
     
     <style>
         :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #7f8c8d;
-            --accent-color: #3498db;
-            --light-gray: #f8f9fa;
-            --medium-gray: #e9ecef;
-            --dark-gray: #6c757d;
-            --text-color: #2c3e50;
+            --primary: #2c3e50;
+            --secondary: #7f8c8d;
+            --accent: #3498db;
+            --light: #f8f9fa;
+            --medium: #e9ecef;
+            --dark: #6c757d;
+            --success: #198754;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --info: #0dcaf0;
         }
         
         body {
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background-color: var(--light-gray);
-            color: var(--text-color);
-            line-height: 1.6;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+            color: var(--primary);
         }
         
-        .card-hover {
-            transition: all 0.3s ease;
-            border: 1px solid var(--medium-gray);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
-            background: white;
+  
+        
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
         }
         
-        .card-hover:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            border-color: var(--accent-color);
+        .stat-card {
+            text-align: center;
+            padding: 1.5rem 1rem;
         }
+        
+
+        
+        .stat-icon img {
+            width: 30px;
+            height: 28px;
+            object-fit: contain;
+        }
+        
         
         .stat-number {
-            font-size: 2.5rem;
-            font-weight: 300;
-            margin-bottom: 0;
-            color: var(--primary-color);
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         
-        .custom-icon {
-            width: 70px;
-            height: 70px;
-            margin: 0 auto 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.3s ease;
-        }
-        
-        .custom-icon img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            filter: grayscale(30%);
-        }
-        
-        .card-hover:hover .custom-icon img {
-            transform: scale(1.05);
-            filter: grayscale(0%);
-        }
-        
-        .header-section {
-            background: white;
-            color: var(--text-color);
-            border-radius: 12px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-            border: 1px solid var(--medium-gray);
-        }
-        
-        .btn-modern {
-            background: var(--primary-color);
-            border: none;
-            color: white;
-            padding: 10px 24px;
-            border-radius: 6px;
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--dark);
             font-weight: 500;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-modern:hover {
-            background: var(--accent-color);
-            color: white;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.2);
-        }
-        
-        .card-title {
-            font-weight: 600;
-            color: var(--primary-color);
             margin-bottom: 0.5rem;
         }
         
-        .card-text {
-            color: var(--dark-gray);
-            font-size: 0.9rem;
-        }
-        
-        .badge {
-            font-weight: 500;
-            padding: 6px 10px;
-            border-radius: 4px;
+        .stat-badge {
             font-size: 0.75rem;
-        }
-        
-        .border-subtle {
-            border-color: var(--medium-gray) !important;
-        }
-        
-        .text-muted {
-            color: var(--dark-gray) !important;
-        }
-        
-        .total-badge {
-            background: var(--primary-color);
-            color: white;
-            padding: 8px 16px;
+            padding: 4px 8px;
             border-radius: 6px;
+            font-weight: 500;
+        }
+        
+        .badge-distribuidor { background: rgba(220, 53, 69, 0.1); color: var(--danger); }
+        .badge-oro { background: rgba(255, 193, 7, 0.1); color: var(--warning); }
+        .badge-satelite { background: rgba(13, 110, 253, 0.1); color: var(--info); }
+        .badge-centro { background: rgba(25, 135, 84, 0.1); color: var(--success); }
+        
+        .header-compact {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        
+        .total-badge-compact {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .btn-modern {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .btn-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(242, 243, 243, 0.4);
+            color: white;
+        }
+        
+        .action-card-compact {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 1.25rem;
+            transition: all 0.3s ease;
+        }
+        
+        .action-card-compact:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .compact-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            color: var(--primary);
+        }
+        
+        .compact-subtitle {
+            font-size: 0.9rem;
+            color: var(--dark);
+            margin-bottom: 0;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+        
+        .info-item {
+            text-align: center;
+            padding: 0.75rem;
+            background: rgba(248, 249, 250, 0.7);
+            border-radius: 8px;
+            border: 1px solid rgba(233, 236, 239, 0.5);
+        }
+        
+        .info-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+        
+        .info-label {
+            font-size: 0.75rem;
+            color: var(--dark);
             font-weight: 500;
         }
         
         @media (max-width: 768px) {
+            .header-compact .row {
+                text-align: center;
+            }
+            
+            .total-badge-compact {
+                margin-top: 1rem;
+                display: inline-block;
+            }
+            
+            .action-card-compact .row {
+                text-align: center;
+            }
+            
+            .action-card-compact .text-md-end {
+                text-align: center !important;
+                margin-top: 1rem;
+            }
+            
+            .stat-card {
+                padding: 1rem 0.5rem;
+            }
+            
             .stat-number {
-                font-size: 2rem;
-            }
-            
-            .custom-icon {
-                width: 50px;
-                height: 50px;
-            }
-            
-            .header-section {
-                padding: 1.5rem;
-                margin-bottom: 1.5rem;
-            }
-            
-            .display-5 {
-                font-size: 1.8rem;
-            }
-            
-            /* Para tablets, 2 columnas */
-            .col-md-3 {
-                flex: 0 0 auto;
-                width: 50%;
+                font-size: 1.75rem;
             }
         }
         
         @media (max-width: 576px) {
-            /* Para móviles, una columna */
-            .col-md-3 {
-                flex: 0 0 auto;
-                width: 100%;
+            .container {
+                padding-left: 0.75rem;
+                padding-right: 0.75rem;
+            }
+            
+            .header-compact {
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+            
+            .stat-icon {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .stat-icon img {
+                width: 24px;
+                height: 24px;
             }
         }
         
-        .section-divider {
-            border-top: 1px solid var(--medium-gray);
-            margin: 2rem 0;
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease;
         }
         
-        .action-card {
-            background: white;
-            border: 1px solid var(--medium-gray);
-            border-radius: 8px;
-            padding: 1.5rem;
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
     </style>
 </head>
 <body>
-    <!-- Header Principal -->
-    <div class="container py-4">
-        <div class="header-section">
+    <div class="container py-3">
+        <!-- Header Compacto -->
+        <div class="header-compact fade-in">
             <div class="row align-items-center">
-                <div class="col-lg-10 col-md-9">
-                    <h1 class="display-5 fw-bold mb-2">Mapa Comercial Carnes San Martín</h1>
-                    <p class="lead mb-0 text-muted">Sistema de gestión de ubicaciones comerciales en Costa Rica</p>
-                    <div class="mt-2">
-                        <span class="badge bg-light text-dark border">
-                            <i class="fas fa-sync-alt me-1"></i>Actualizado en tiempo real
-                        </span>
+                <div class="col-lg-9 col-md-8">
+                    <h4 class="fw-bold mb-1">🌍 Mapa Comercial</h4>
+                    <p class="text-muted mb-2">Distribuidora de Carnes San Martín - Costa Rica</p>
+                    <div class="d-flex gap-2 flex-wrap">
+
                     </div>
                 </div>
-                <div class="col-lg-2 col-md-3 text-center text-md-end">
-                    <div class="total-badge">
-                        <small class="d-block opacity-75">Total</small>
-                        <strong class="h4 mb-0">{{ stats.total_general }}</strong>
+                <div class="col-lg-3 col-md-4 text-center text-md-end">
+                    <div class="total-badge-compact">
+                        <small class="opacity-90">Total Activos</small>
+                        <div class="h4 mb-0 fw-bold">{{ stats.total_general }}</div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Tarjetas de Estadísticas - 4 COLUMNAS -->
-        <div class="row g-4 mb-5">
-                        <div class="col-md-3">
-                <div class="card card-hover border-subtle">
-                    <div class="card-body text-center p-4">
-                        <div class="custom-icon">
-                            <img src="/static/images/logo-verde-activo.png" alt="Centros de Distribución">
-                        </div>
-                        <h5 class="card-title">Centros de Distribución</h5>
-                        <h2 class="stat-number">{{ stats.centros_distribucion }}</h2>
-                        <p class="card-text">Almacenes centrales</p>
-                        <div class="mt-3">
-                            <span class="badge bg-light text-dark border">
-                                <i class="fas fa-warehouse me-1"></i>Logística
-                            </span>
-                        </div>
+        <!-- Grid de Estadísticas Compacto -->
+        <div class="row g-3 mb-4">
+            <!-- Centros de Distribución -->
+            <div class="col-xl-3 col-lg-6 col-md-6">
+                <div class="glass-card stat-card fade-in">
+                    <div class="stat-icon">
+                        <img src="/static/images/logo-verde-activo.png" alt="Centros">
                     </div>
+                    <div class="stat-number">{{ stats.centros_distribucion }}</div>
+                    <div class="stat-label">Centros Distribución</div>
+                    <span class="stat-badge badge-centro">
+                        <i class="fas fa-warehouse me-1"></i>Logística y Almacenaje
+                    </span>
                 </div>
             </div>
+            
             <!-- Distribuidores Autorizados -->
-            <div class="col-md-3">
-                <div class="card card-hover border-subtle">
-                    <div class="card-body text-center p-4">
-                        <div class="custom-icon">
-                            <img src="/static/images/logo-rojo-activo.png" alt="Distribuidores Autorizados">
-                        </div>
-                        <h5 class="card-title">Distribuidores Autorizados</h5>
-                        <h2 class="stat-number">{{ stats.distribuidores }}</h2>
-                        <p class="card-text">Tiendas de Venta al Detalle</p>
-                        <div class="mt-3">
-                            <span class="badge bg-light text-dark border">
-                                <i class="fas fa-check me-1"></i>Activos
-                            </span>
-                        </div>
+            <div class="col-xl-3 col-lg-6 col-md-6">
+                <div class="glass-card stat-card fade-in">
+                    <div class="stat-icon">
+                        <img src="/static/images/logo-rojo-activo.png" alt="Distribuidores">
                     </div>
+                    <div class="stat-number">{{ stats.distribuidores }}</div>
+                    <div class="stat-label">Distribuidores</div>
+                    <span class="stat-badge badge-distribuidor">
+                        <i class="fas fa-store me-1"></i>Venta Detalle
+                    </span>
                 </div>
             </div>
             
             <!-- Tiendas de Oro -->
-            <div class="col-md-3">
-                <div class="card card-hover border-subtle">
-                    <div class="card-body text-center p-4">
-                        <div class="custom-icon">
-                            <img src="/static/images/logo-dorado-activo.png" alt="Tiendas de Oro">
-                        </div>
-                        <h5 class="card-title">Tiendas de Oro</h5>
-                        <h2 class="stat-number">{{ stats.tiendas_oro }}</h2>
-                        <p class="card-text">Congeladores especializados</p>
-                        <div class="mt-3">
-                            <span class="badge bg-light text-dark border">
-                                <i class="fas fa-thermometer-half me-1"></i>Control temperatura
-                            </span>
-                        </div>
+            <div class="col-xl-3 col-lg-6 col-md-6">
+                <div class="glass-card stat-card fade-in">
+                    <div class="stat-icon">
+                        <img src="/static/images/logo-dorado-activo.png" alt="Tiendas Oro">
                     </div>
+                    <div class="stat-number">{{ stats.tiendas_oro }}</div>
+                    <div class="stat-label">Tiendas Oro</div>
+                    <span class="stat-badge badge-oro">
+                        <i class="fas fa-star me-1"></i>Cogeladores
+                    </span>
                 </div>
             </div>
 
             <!-- Tiendas Satélite -->
-            <div class="col-md-3">
-                <div class="card card-hover border-subtle">
-                    <div class="card-body text-center p-4">
-                        <div class="custom-icon">
-                            <img src="/static/images/logo-azul-activo.png" alt="Tiendas Satélite">
-                        </div>
-                        <h5 class="card-title">Tiendas Satélite</h5>
-                        <h2 class="stat-number">{{ stats.tiendas_satelite }}</h2>
-                        <p class="card-text">Puntos de venta asociados</p>
-                        <div class="mt-3">
-                            <span class="badge bg-light text-dark border">
-                                <i class="fas fa-network-wired me-1"></i>Red comercial
-                            </span>
-                        </div>
+            <div class="col-xl-3 col-lg-6 col-md-6">
+                <div class="glass-card stat-card fade-in">
+                    <div class="stat-icon">
+                        <img src="/static/images/logo-azul-activo.png" alt="Tiendas Satélite">
                     </div>
+                    <div class="stat-number">{{ stats.tiendas_satelite }}</div>
+                    <div class="stat-label">Tiendas Satélite</div>
+                    <span class="stat-badge badge-satelite">
+                        <i class="fas fa-network-wired me-1"></i>Red
+                    </span>
                 </div>
             </div>
-
-            <!-- Centros de Distribución -->
-
         </div>
 
-        <!-- Panel de Acciones -->
-        <div class="row mb-5">
+        <!-- Panel de Acciones Compacto -->
+        <div class="row g-3 mb-4">
+            <!-- Mapa Interactivo -->
             <div class="col-12">
-                <div class="action-card">
+                <div class="action-card-compact fade-in">
                     <div class="row align-items-center">
                         <div class="col-md-8">
-                            <h4 class="card-title mb-1">Mapa Interactivo</h4>
-                            <p class="card-text text-muted mb-0">
-                                Visualice y gestione todas las ubicaciones comerciales en un mapa interactivo.
+                            <h5 class="compact-title">
+                                <i class="fas fa-map-marked-alt me-2 text-primary"></i>
+                                Mapa Interactivo
+                            </h5>
+                            <p class="compact-subtitle">
+                                Visualice todas las ubicaciones en tiempo real con filtros avanzados
                             </p>
                         </div>
                         <div class="col-md-4 text-md-end">
-                            <a href="/mapa" class="btn btn-modern">
-                                <i class="fas fa-map-marked-alt me-2"></i>Abrir Mapa
+                            <a href="/mapa" class="btn btn-modern btn-sm">
+                                <i class="fas fa-play me-1"></i>Abrir Mapa
                             </a>
                         </div>
                     </div>
@@ -304,22 +340,68 @@
             </div>
         </div>
 
-        <div class="section-divider"></div>
+        {% if stats.aperturas_2026 and (stats.aperturas_2026.distribuidores > 0 or stats.aperturas_2026.tiendas_oro > 0 or stats.aperturas_2026.tiendas_satelite > 0 or stats.aperturas_2026.centros_distribucion > 0) %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="action-card-compact fade-in">
+            <h6 class="compact-title mb-3">
+                <i class="fas fa-rocket me-2 text-success"></i>
+                Expansión 2026
+                <span class="badge bg-success ms-2">Nuevo</span>
+            </h6>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-value">{{ stats.aperturas_2026.distribuidores or 0 }}</div>
+                    <div class="info-label">Distribuidores Autorizados 2026</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-value">{{ stats.aperturas_2026.tiendas_oro or 0 }}</div>
+                    <div class="info-label">Tiendas Oro 2026</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-value">{{ stats.aperturas_2026.tiendas_satelite or 0 }}</div>
+                    <div class="info-label">Tiendas Satélite 2026</div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<!-- Mensaje alternativo si no hay expansiones 2026 -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="action-card-compact fade-in">
+            <h6 class="compact-title mb-3">
+                <i class="fas fa-calendar-check me-2 text-secondary"></i>
+                Planificación Futura
+            </h6>
+            <div class="text-center py-3">
+                <p class="text-muted mb-0">No hay aperturas programadas para 2026</p>
+                <small class="text-muted">Consulte el panel de gestión para agregar nuevas ubicaciones</small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
 
-        <!-- Mantenimiento -->
-        <div class="row mb-3">
+        <!-- Mantenimiento Compacto -->
+        <div class="row">
             <div class="col-12">
-                <div class="action-card">
+                <div class="action-card-compact fade-in">
                     <div class="row align-items-center">
                         <div class="col-md-8">
-                            <h4 class="card-title mb-1">Mantenimiento</h4>
-                            <p class="card-text text-muted mb-0">
-                                Gestión avanzada de distribuidores y tiendas (acceso restringido).
+                            <h5 class="compact-title">
+                                <i class="fas fa-tools me-2 text-secondary"></i>
+                                Panel de Gestión
+                            </h5>
+                            <p class="compact-subtitle">
+                                Administración avanzada del sistema (acceso restringido)
                             </p>
                         </div>
                         <div class="col-md-4 text-md-end">
-                            <a href="/acceso-mantenimiento" class="btn btn-outline-secondary">
-                                <i class="fas fa-tools me-2"></i>Acceder
+                            <a href="/acceso-mantenimiento" class="btn btn-outline-secondary btn-sm">
+                                <i class="fas fa-lock me-1"></i>Acceder
                             </a>
                         </div>
                     </div>
@@ -327,19 +409,21 @@
             </div>
         </div>
 
-        <!-- Footer -->
+        <!-- Footer Compacto -->
         <div class="row mt-4">
             <div class="col-12 text-center">
-                <p class="text-muted">
+                <p class="text-muted mb-1">
                     <small>
-                        <i class="fas fa-info-circle me-1"></i>
-                        Utilice el control de capas en el mapa para filtrar por tipo de ubicación
+                        <i class="fas fa-shield-alt me-1"></i>
+                        Sistema seguro | Carnes San Martín
                     </small>
                 </p>
                 <p class="text-muted">
                     <small>
-                        Sistema desarrollado para <strong>Carnes San Martín</strong> | 
-                        <i class="fas fa-map-marker-alt me-1"></i>Costa Rica
+                        <i class="fas fa-map-marker-alt me-1"></i>
+                        Costa Rica • 
+                        <i class="fas fa-clock me-1"></i>
+                        {{ now.strftime('%d/%m/%Y %H:%M') if now else 'Actualizado' }}
                     </small>
                 </p>
             </div>
@@ -350,27 +434,37 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
-        // Efectos interactivos adicionales
         document.addEventListener('DOMContentLoaded', function() {
-            // Animación para las tarjetas al hacer scroll
-            const cards = document.querySelectorAll('.card-hover');
+            // Inicializar tooltips
+            const tooltips = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltips.map(t => new bootstrap.Tooltip(t));
+            
+            // Animación de entrada escalonada
+            const fadeElements = document.querySelectorAll('.fade-in');
             
             const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
+                entries.forEach((entry, index) => {
                     if (entry.isIntersecting) {
-                        entry.target.style.opacity = '1';
-                        entry.target.style.transform = 'translateY(0)';
+                        setTimeout(() => {
+                            entry.target.classList.add('visible');
+                        }, index * 100);
                     }
                 });
             }, { threshold: 0.1 });
             
+            fadeElements.forEach(el => observer.observe(el));
+            
+            // Efectos hover mejorados
+            const cards = document.querySelectorAll('.glass-card, .action-card-compact');
             cards.forEach(card => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(20px)';
-                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-                observer.observe(card);
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px)';
+                });
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
             });
         });
     </script>
 </body>
-</html>
+</html> 

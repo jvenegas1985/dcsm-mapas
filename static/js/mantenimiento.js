@@ -52,6 +52,231 @@ function cargarSeccionActiva() {
 // FUNCIONES PARA CENTROS DE DISTRIBUCIÓN
 // ============================================================================
 
+function exportarDatos() {
+    mostrarLoadingGestion('Exportando datos...');
+    
+    fetch('/api/exportar-datos')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error en la respuesta del servidor');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // Crear y descargar archivo JSON
+                const blob = new Blob([JSON.stringify(data.datos, null, 2)], { 
+                    type: 'application/json;charset=utf-8' 
+                });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `backup_datos_carnes_san_martin_${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                mostrarResultadoGestion('success', 
+                    `✅ <strong>Datos exportados correctamente</strong><br>
+                     📊 <strong>Resumen:</strong><br>
+                     • ${data.resumen.centros} centros de distribución<br>
+                     • ${data.resumen.distribuidores} distribuidores autorizados<br>
+                     • ${data.resumen.tiendas_oro} tiendas oro<br>
+                     • ${data.resumen.tiendas_satelite} tiendas satélite<br>
+                     • <strong>Total: ${data.resumen.total} ubicaciones</strong>`);
+            } else {
+                mostrarResultadoGestion('error', `❌ <strong>Error al exportar:</strong> ${data.error || 'Error desconocido'}`);
+            }
+        })
+        .catch(error => {
+            console.error('Error exportando datos:', error);
+            mostrarResultadoGestion('error', `❌ <strong>Error de conexión:</strong> ${error.message}`);
+        });
+}
+
+function importarDatos() {
+    const fileInput = document.getElementById('importFile');
+    const file = fileInput.files[0];
+    
+    if (!file) {
+        mostrarResultadoGestion('error', '❌ <strong>Por favor selecciona un archivo JSON</strong>');
+        return;
+    }
+    
+    // Validar tipo de archivo
+    if (!file.name.toLowerCase().endsWith('.json')) {
+        mostrarResultadoGestion('error', '❌ <strong>El archivo debe ser un JSON</strong>');
+        return;
+    }
+    
+    const reader = new FileReader();
+    
+    reader.onload = function(e) {
+        try {
+            const datos = JSON.parse(e.target.result);
+            
+            // Validar estructura básica del JSON
+            if (!datos || typeof datos !== 'object') {
+                throw new Error('El archivo JSON no tiene una estructura válida');
+            }
+            
+            // Confirmar antes de importar (ya que reemplaza todo)
+            if (!confirm('⚠️ ¿Estás seguro de importar estos datos?\n\nEsto reemplazará TODOS los datos actuales. Esta acción no se puede deshacer.')) {
+                return;
+            }
+            
+            mostrarLoadingGestion('Importando datos...');
+            
+            fetch('/api/importar-datos', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(datos)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error en la respuesta del servidor');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    let mensaje = `✅ <strong>Datos importados correctamente</strong><br>
+                                  📥 <strong>Resumen de importación:</strong><br>`;
+                    
+                    for (const [categoria, cantidad] of Object.entries(data.resumen)) {
+                        const nombre = categoria.replace('_', ' ');
+                        mensaje += `• ${cantidad} ${nombre}<br>`;
+                    }
+                    
+                    mensaje += `• <strong>Total: ${data.total} registros</strong><br><br>
+                               <button class="btn btn-sm btn-success mt-2" onclick="location.reload()">
+                                   <i class="fas fa-sync me-1"></i>Recargar página para ver cambios
+                               </button>`;
+                    
+                    mostrarResultadoGestion('success', mensaje);
+                    
+                    // Limpiar el input de archivo
+                    fileInput.value = '';
+                    
+                } else {
+                    mostrarResultadoGestion('error', `❌ <strong>Error al importar:</strong> ${data.error || 'Error desconocido'}`);
+                }
+            })
+            .catch(error => {
+                console.error('Error importando datos:', error);
+                mostrarResultadoGestion('error', `❌ <strong>Error de conexión:</strong> ${error.message}`);
+            });
+            
+        } catch (error) {
+            console.error('Error procesando archivo:', error);
+            mostrarResultadoGestion('error', `❌ <strong>Error en el archivo JSON:</strong> ${error.message}`);
+        }
+    };
+    
+    reader.onerror = function() {
+        mostrarResultadoGestion('error', '❌ <strong>Error al leer el archivo</strong>');
+    };
+    
+    reader.readAsText(file);
+}
+
+function crearBackup() {
+    if (!confirm('💾 ¿Crear una copia de seguridad de todos los datos?')) {
+        return;
+    }
+    
+    mostrarLoadingGestion('Creando copia de seguridad...');
+    
+    fetch('/api/backup-datos', { 
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Error en la respuesta del servidor');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            mostrarResultadoGestion('success', 
+                `💾 <strong>Backup creado correctamente</strong><br>
+                 📁 <strong>Archivo:</strong> ${data.backup_file}<br>
+                 📊 <strong>Resumen:</strong><br>
+                 • ${data.resumen.centros} centros de distribución<br>
+                 • ${data.resumen.distribuidores} distribuidores autorizados<br>
+                 • ${data.resumen.tiendas_oro} tiendas oro<br>
+                 • ${data.resumen.tiendas_satelite} tiendas satélite`);
+        } else {
+            mostrarResultadoGestion('error', `❌ <strong>Error al crear backup:</strong> ${data.error || 'Error desconocido'}`);
+        }
+    })
+    .catch(error => {
+        console.error('Error creando backup:', error);
+        mostrarResultadoGestion('error', `❌ <strong>Error de conexión:</strong> ${error.message}`);
+    });
+}
+
+// Funciones auxiliares para la gestión de datos
+function mostrarLoadingGestion(mensaje) {
+    document.getElementById('resultadoGestion').innerHTML = 
+        `<div class="alert alert-info d-flex align-items-center">
+            <i class="fas fa-spinner fa-spin me-2"></i>
+            <div>${mensaje}</div>
+         </div>`;
+}
+
+function mostrarResultadoGestion(tipo, mensaje) {
+    const clase = tipo === 'success' ? 'alert-success' : 'alert-danger';
+    document.getElementById('resultadoGestion').innerHTML = 
+        `<div class="alert ${clase}">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-${tipo === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
+                <div>${mensaje}</div>
+            </div>
+         </div>`;
+}
+
+// ============================================================================
+// FUNCIONES EXISTENTES DEL PANEL DE MANTENIMIENTO
+// ============================================================================
+
+// Navegación del sidebar
+document.addEventListener('DOMContentLoaded', function() {
+    // Cargar datos iniciales
+    cargarCentrosDistribucion();
+    cargarDistribuidores();
+    cargarTiendasOro();
+    cargarTiendasSatelite();
+    
+    // Navegación del sidebar
+    document.querySelectorAll('.nav-link[data-target]').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Remover active de todos los links
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            // Agregar active al link clickeado
+            this.classList.add('active');
+            
+            // Ocultar todas las secciones
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Mostrar la sección correspondiente
+            const target = this.getAttribute('data-target');
+            document.getElementById(target).classList.add('active');
+        });
+    });
+});
+
+
 function cargarCentrosDistribucion() {
     console.log('Cargando centros de distribución...');
     fetch('/api/centros-distribucion')

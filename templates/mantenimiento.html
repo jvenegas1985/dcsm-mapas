@@ -42,23 +42,23 @@
                 <h4 class="mb-4">🛠️ Mantenimiento</h4>
                 <nav class="nav flex-column">
                     <a class="nav-link active" href="#" data-target="centros-distribucion">
-                        <i class="fas fa-warehouse me-2"></i>Centros Distribución
+                        <i class="fas fa-warehouse me-2"></i>Centros de Distribución
                     </a>
                     <a class="nav-link" href="#" data-target="distribuidores">
-                        <i class="fas fa-truck me-2"></i>Distribuidores
+                        <i class="fas fa-truck me-2"></i>Distribuidores Autorizados
                     </a>
                     <a class="nav-link" href="#" data-target="tiendas-oro">
-                        <i class="fas fa-medal me-2"></i>Tiendas Oro
+                        <i class="fas fa-medal me-2"></i>Tiendas de Oro
                     </a>
                     <a class="nav-link" href="#" data-target="tiendas-satelite">
                         <i class="fas fa-store me-2"></i>Tiendas Satélite
                     </a>
                     <hr>
                     <a class="nav-link" href="/">
-                        <i class="fas fa-map me-2"></i>Ver Mapa
+                        <i class="fas fa-map me-2"></i>Volver a Estadisticas
                     </a>
                     <a class="nav-link" href="/mapa">
-                        <i class="fas fa-globe me-2"></i>Mapa Completo
+                        <i class="fas fa-globe me-2"></i>Mapa Interactivo
                     </a>
                     <a class="nav-link text-danger" href="/logout-mantenimiento">
                         <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
@@ -188,7 +188,54 @@
             </div>
         </div>
     </div>
-
+<div class="card mb-4">
+    <div class="card-header bg-warning text-dark">
+        <h5 class="mb-0">
+            <i class="fas fa-database me-2"></i>
+            Gestión de Datos
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <!-- Exportar Datos -->
+            <div class="col-md-6">
+                <div class="border p-3 rounded">
+                    <h6><i class="fas fa-download me-2 text-success"></i>Exportar Datos</h6>
+                    <p class="text-muted small">Descarga todos los datos como archivo JSON</p>
+                    <button class="btn btn-success btn-sm" onclick="exportarDatos()">
+                        <i class="fas fa-file-export me-1"></i>Exportar JSON
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Importar Datos -->
+            <div class="col-md-6">
+                <div class="border p-3 rounded">
+                    <h6><i class="fas fa-upload me-2 text-primary"></i>Importar Datos</h6>
+                    <p class="text-muted small">Carga datos desde archivo JSON (reemplaza todo)</p>
+                    <input type="file" id="importFile" accept=".json" class="form-control form-control-sm mb-2">
+                    <button class="btn btn-primary btn-sm" onclick="importarDatos()">
+                        <i class="fas fa-file-import me-1"></i>Importar JSON
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Backup -->
+            <div class="col-12">
+                <div class="border p-3 rounded">
+                    <h6><i class="fas fa-save me-2 text-info"></i>Backup</h6>
+                    <p class="text-muted small">Crea una copia de seguridad con timestamp</p>
+                    <button class="btn btn-info btn-sm" onclick="crearBackup()">
+                        <i class="fas fa-copy me-1"></i>Crear Backup
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Resultados -->
+        <div id="resultadoGestion" class="mt-3"></div>
+    </div>
+</div>
     <!-- Modal para Centros de Distribución -->
     <div class="modal fade" id="modalCentroDistribucion" tabindex="-1">
         <div class="modal-dialog modal-lg">
@@ -471,5 +518,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/static/js/mantenimiento.js"></script>
+    
 </body>
 </html>

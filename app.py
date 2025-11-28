@@ -14,6 +14,166 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # PIN hardcodeado
 MAINTENANCE_PIN = "2025"
 
+
+# Agregar cerca de las otras funciones de datos
+def inicializar_datos_si_no_existen():
+    """Inicializar datos vacíos si los archivos no existen"""
+    archivos = [
+        'centros_distribucion.json',
+        'distribuidores_autorizados.json', 
+        'tiendas_oro.json',
+        'tiendas_satelite.json'
+    ]
+    
+    for archivo in archivos:
+        ruta = os.path.join(DATABASE_PATH, archivo)
+        if not os.path.exists(ruta):
+            guardar_datos_en_json(archivo, [])
+            print(f"✅ Archivo inicializado: {archivo}")
+
+# Llamar esta función al inicio del app
+inicializar_datos_si_no_existen()
+
+
+# ============================================================================
+# RUTAS PARA IMPORTAR/EXPORTAR DATOS
+# ============================================================================
+
+@app.route('/api/exportar-datos')
+def exportar_datos():
+    """Exportar todos los datos como un solo JSON"""
+    if not session.get('mantenimiento_autorizado'):
+        return jsonify({'error': 'No autorizado'}), 401
+    
+    try:
+        datos_exportados = {
+            'version': '1.0',
+            'exportado': datetime.now().isoformat(),
+            'total_ubicaciones': 0,
+            'centros_distribucion': cargar_datos_desde_json('centros_distribucion.json'),
+            'distribuidores_autorizados': cargar_datos_desde_json('distribuidores_autorizados.json'),
+            'tiendas_oro': cargar_datos_desde_json('tiendas_oro.json'),
+            'tiendas_satelite': cargar_datos_desde_json('tiendas_satelite.json')
+        }
+        
+        # Calcular total
+        total = (len(datos_exportados['centros_distribucion']) + 
+                len(datos_exportados['distribuidores_autorizados']) + 
+                len(datos_exportados['tiendas_oro']) + 
+                len(datos_exportados['tiendas_satelite']))
+        datos_exportados['total_ubicaciones'] = total
+        
+        print(f"📤 Exportando {total} ubicaciones...")
+        
+        return jsonify({
+            'success': True, 
+            'datos': datos_exportados,
+            'resumen': {
+                'centros': len(datos_exportados['centros_distribucion']),
+                'distribuidores': len(datos_exportados['distribuidores_autorizados']),
+                'tiendas_oro': len(datos_exportados['tiendas_oro']),
+                'tiendas_satelite': len(datos_exportados['tiendas_satelite']),
+                'total': total
+            }
+        })
+    
+    except Exception as e:
+        print(f"❌ Error exportando datos: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/importar-datos', methods=['POST'])
+def importar_datos():
+    """Importar datos desde JSON (reemplaza todo)"""
+    if not session.get('mantenimiento_autorizado'):
+        return jsonify({'error': 'No autorizado'}), 401
+    
+    try:
+        datos = request.get_json()
+        
+        if not datos:
+            return jsonify({'success': False, 'error': 'No se recibieron datos'}), 400
+        
+        # Validar estructura básica
+        if not any(key in datos for key in ['centros_distribucion', 'distribuidores_autorizados', 'tiendas_oro', 'tiendas_satelite']):
+            return jsonify({'success': False, 'error': 'Formato de datos inválido. El JSON debe contener las categorías de datos.'}), 400
+        
+        # Contadores para el resumen
+        contadores = {}
+        
+        # Importar cada categoría (usar get para evitar KeyError)
+        categorias = {
+            'centros_distribucion': datos.get('centros_distribucion', []),
+            'distribuidores_autorizados': datos.get('distribuidores_autorizados', []),
+            'tiendas_oro': datos.get('tiendas_oro', []),
+            'tiendas_satelite': datos.get('tiendas_satelite', [])
+        }
+        
+        for categoria, datos_categoria in categorias.items():
+            archivo = f"{categoria}.json"
+            if guardar_datos_en_json(archivo, datos_categoria):
+                contadores[categoria] = len(datos_categoria)
+                print(f"✅ Importados {len(datos_categoria)} registros en {archivo}")
+            else:
+                return jsonify({'success': False, 'error': f'Error guardando {archivo}'}), 500
+        
+        total_importado = sum(contadores.values())
+        print(f"📥 Importación completada: {total_importado} registros")
+        
+        return jsonify({
+            'success': True, 
+            'message': 'Datos importados correctamente',
+            'resumen': contadores,
+            'total': total_importado
+        })
+    
+    except Exception as e:
+        print(f"❌ Error importando datos: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/backup-datos', methods=['POST'])
+def backup_datos():
+    """Crear backup con timestamp"""
+    if not session.get('mantenimiento_autorizado'):
+        return jsonify({'error': 'No autorizado'}), 401
+    
+    try:
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        backup_data = {
+            'version': '1.0',
+            'backup_timestamp': timestamp,
+            'exportado': datetime.now().isoformat(),
+            'centros_distribucion': cargar_datos_desde_json('centros_distribucion.json'),
+            'distribuidores_autorizados': cargar_datos_desde_json('distribuidores_autorizados.json'),
+            'tiendas_oro': cargar_datos_desde_json('tiendas_oro.json'),
+            'tiendas_satelite': cargar_datos_desde_json('tiendas_satelite.json')
+        }
+        
+        # Guardar archivo de backup
+        backup_filename = f'backup_{timestamp}.json'
+        backup_path = os.path.join(DATABASE_PATH, backup_filename)
+        
+        with open(backup_path, 'w', encoding='utf-8') as f:
+            json.dump(backup_data, f, indent=2, ensure_ascii=False)
+        
+        print(f"💾 Backup creado: {backup_filename}")
+        
+        return jsonify({
+            'success': True, 
+            'backup_file': backup_filename,
+            'timestamp': timestamp,
+            'resumen': {
+                'centros': len(backup_data['centros_distribucion']),
+                'distribuidores': len(backup_data['distribuidores_autorizados']),
+                'tiendas_oro': len(backup_data['tiendas_oro']),
+                'tiendas_satelite': len(backup_data['tiendas_satelite'])
+            }
+        })
+    
+    except Exception as e:
+        print(f"❌ Error creando backup: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 # Ruta para archivos estáticos
 @app.route('/static/<path:path>')
 def serve_static(path):

@@ -1,33 +1,33 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mapa Comercial - Carnes San Martín</title>
+
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
     <style>
-        body, html {
+        html, body {
             margin: 0;
             padding: 0;
             height: 100%;
+            width: 100%;
             overflow: hidden;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-family: 'Segoe UI', system-ui, sans-serif;
         }
-        .header {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            background: white;
-            padding: 12px 18px;
-            border-radius: 8px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
-            z-index: 1001;
-            max-width: 320px;
-            border: 1px solid #e9ecef;
+
+        /* El mapa de Folium ocupará toda la pantalla */
+        .folium-map {
+            height: 100dvh !important;
+            width: 100vw !important;
         }
+
+        /* Botón de inicio */
         .home-btn {
-            position: absolute;
+            position: fixed;
             top: 15px;
             right: 15px;
             background: #2c3e50;
@@ -37,212 +37,49 @@
             text-decoration: none;
             z-index: 1001;
             font-weight: 500;
-            transition: all 0.3s ease;
-            border: none;
+            transition: 0.3s;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             white-space: nowrap;
         }
+
         .home-btn:hover {
             background: #3498db;
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
-            color: white;
-        }
-        #map {
-            height: 100vh;
-            width: 100vw;
-        }
-        .header h3 {
-            margin: 0;
-            color: #2c3e50;
-            font-weight: 600;
-            font-size: 1.1rem;
-        }
-        .header p {
-            margin: 4px 0 0 0;
-            font-size: 0.8rem;
-            color: #6c757d;
-        }
-        .legend-info {
-            margin-top: 8px;
-            padding-top: 8px;
-            border-top: 1px solid #e9ecef;
-            font-size: 0.75rem;
-            color: #6c757d;
         }
 
-        /* 🔥 SELECTOR DE CAPAS COMPACTO */
-        .leaflet-control-layers {
-            font-size: 12px !important;
-            border: 1px solid #ccc !important;
-            border-radius: 4px !important;
-            background: white !important;
-            padding: 4px !important;
-            min-width: 140px !important;
-            box-shadow: 0 1px 5px rgba(0,0,0,0.15) !important;
-            margin-top: 10px !important;
-            margin-left: 10px !important;
-        }
-
-        .leaflet-control-layers-toggle {
-            width: 26px !important;
-            height: 26px !important;
-            background-size: 18px 18px !important;
-            background-position: center !important;
-        }
-
-        .leaflet-control-layers-list {
-            font-size: 12px !important;
-            line-height: 1.3 !important;
-        }
-
-        .leaflet-control-layers label {
-            font-size: 12px !important;
-            margin-bottom: 4px !important;
-            padding: 2px 0 !important;
-            display: flex !important;
-            align-items: center !important;
-            cursor: pointer !important;
-            border-bottom: 1px solid #f0f0f0 !important;
-            font-weight: normal !important;
-        }
-
-        .leaflet-control-layers label:last-child {
-            border-bottom: none !important;
-        }
-
-        .leaflet-control-layers input[type="checkbox"] {
-            width: 12px !important;
-            height: 12px !important;
-            margin-right: 6px !important;
-            cursor: pointer !important;
-        }
-
-        .leaflet-control-layers span {
-            font-weight: normal !important;
-            color: #2c3e50 !important;
-            font-size: 12px !important;
-        }
-
-        .leaflet-control-layers-expanded {
-            padding: 6px 8px !important;
-        }
-
-        .leaflet-control-layers-base {
-            margin-bottom: 6px !important;
-        }
-
-        .leaflet-control-layers-overlays {
-            margin-top: 6px !important;
-        }
-
-        .leaflet-control-layers-separator {
-            height: 1px !important;
-            background: #e9ecef !important;
-            margin: 6px 0 !important;
-            border-radius: 1px !important;
-        }
-
-        /* Efecto hover sutil */
-        .leaflet-control-layers label:hover {
-            background-color: #f8f9fa !important;
-            border-radius: 2px !important;
-            padding-left: 4px !important;
-            margin-left: -4px !important;
-            margin-right: -4px !important;
-            transition: all 0.2s ease !important;
-        }
-
-        /* Título del selector compacto */
-        .leaflet-control-layers h4 {
-            font-size: 13px !important;
-            font-weight: 600 !important;
-            color: #2c3e50 !important;
-            margin-bottom: 6px !important;
-            text-align: center !important;
-            border-bottom: 1px solid #3498db !important;
-            padding-bottom: 4px !important;
-        }
-
-        /* Posición específica para el control en topleft */
-        .leaflet-top.leaflet-left {
-            top: 80px !important;
-            left: 10px !important;
-        }
-
-        .leaflet-control-container .leaflet-top.leaflet-left {
-            margin-top: 10px !important;
-        }
-
-        /* Responsive para móviles */
+        /* Ajustes extra móviles */
         @media (max-width: 768px) {
-            .header {
-                max-width: 250px;
-                padding: 10px 12px;
-            }
-            
-            .leaflet-control-layers {
-                min-width: 130px !important;
-                padding: 4px !important;
-                margin-top: 10px !important;
-                font-size: 11px !important;
-            }
-            
-            .leaflet-control-layers label {
-                font-size: 11px !important;
-                margin-bottom: 3px !important;
-            }
-            
-            .leaflet-top.leaflet-left {
-                top: 70px !important;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .header {
-                max-width: 200px;
-            }
             .home-btn {
-                padding: 6px 10px;
-                font-size: 0.8rem;
-            }
-            .home-btn span {
-                display: none;
-            }
-            
-            .leaflet-control-layers {
-                min-width: 120px !important;
-                font-size: 10px !important;
-                margin-top: 8px !important;
-                padding: 3px !important;
-            }
-            
-            .leaflet-control-layers label {
-                font-size: 10px !important;
-                margin-bottom: 2px !important;
-            }
-            
-            .leaflet-control-layers input[type="checkbox"] {
-                width: 10px !important;
-                height: 10px !important;
-            }
-            
-            .leaflet-top.leaflet-left {
-                top: 60px !important;
+                padding: 7px 12px;
+                font-size: 0.85rem;
             }
         }
     </style>
 </head>
+
 <body>
-    
-    
+
+    <!-- Botón ir al inicio -->
     <a href="/" class="home-btn">
-        <i class="fas fa-home"></i> <span>Volver al Inicio</span>
+        <i class="fas fa-home"></i> Inicio
     </a>
-    
-    <!-- El mapa se renderiza aquí directamente -->
-    <div id="map">
-        {{ mapa_html|safe }}
-    </div>
+
+    <!-- AQUI SE INSERTA DIRECTO EL MAPA DE FOLIUM -->
+    {{ mapa_html|safe }}
+
+    <!-- Script para asegurar altura correcta en móviles -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const fMap = document.querySelector(".folium-map");
+            if (fMap) {
+                function ajustar() {
+                    fMap.style.height = window.innerHeight + "px";
+                }
+                ajustar();
+                window.addEventListener("resize", ajustar);
+            }
+        });
+    </script>
+
 </body>
 </html>

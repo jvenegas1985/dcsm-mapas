@@ -761,12 +761,46 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 </div>
 """
-    
-    # Agregar CSS y leyenda al mapa
     mapa.get_root().header.add_child(folium.Element(css_style))
-    mapa.get_root().html.add_child(folium.Element(leyenda_html))
     
-    return mapa._repr_html_()
+    # ============================================================================
+    # RENDERIZAR Y CORREGIR EL HTML GENERADO
+    # ============================================================================
+    html = mapa.get_root().render()
+    
+    # 🔥 CORRECCIONES CRÍTICAS PARA MÓVILES
+    import re
+    
+    # 1. Corregir la estructura HTML base
+    html = html.replace('<html>', '<html style="height:100vh;width:100vw;overflow:hidden;">')
+    html = html.replace('<body>', '<body style="margin:0;padding:0;height:100vh;width:100vw;overflow:hidden;position:fixed;">')
+    
+    # 2. Reemplazar cualquier altura/anchura generada por Folium
+    html = re.sub(r'style="[^"]*height:\s*\d+px[^"]*"', 
+                 'style="height:100vh !important; width:100vw !important; position:absolute; top:0; left:0;"', 
+                 html)
+    
+    # 3. Asegurar que el div principal del mapa tenga las dimensiones correctas
+    html = re.sub(r'<div id="map"[^>]*>', 
+                 '<div id="map" style="height:100vh !important; width:100vw !important; position:absolute; top:0; left:0; z-index:0;">', 
+                 html)
+    
+    # 4. Corregir el iframe interno si existe
+    html = re.sub(r'<iframe[^>]*style="[^"]*"', 
+                 '<iframe style="height:100vh !important; width:100vw !important; border:none; position:absolute; top:0; left:0;"', 
+                 html)
+    
+    # 5. Agregar meta tags para móviles si no existen
+    if '<meta name="viewport"' not in html:
+        html = html.replace('<head>', 
+                           '<head>\n    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">\n    <meta name="apple-mobile-web-app-capable" content="yes">\n    <meta name="mobile-web-app-capable" content="yes">')
+    
+    # 6. Asegurar que el contenedor de Folium tenga clase para referencia
+    html = html.replace('class="folium-map"', 'class="folium-map" style="height:100vh !important; width:100vw !important; position:absolute; top:0; left:0;"')
+    
+    print("✅ Mapa renderizado con correcciones para móviles")
+    
+    return html
 
 
 
